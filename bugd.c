@@ -1,4 +1,4 @@
-/* $Id: bugd.c,v 1.2 2013/09/17 15:17:06 moonsdad Exp $ */
+/* $Id: bugd.c,v 1.3 2013/09/17 21:15:06 moonsdad Exp $ */
 
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include <stdlib.h>
@@ -6,10 +6,12 @@
 #include <sqlite3.h>
 
 /* ARRAY ACCESS CONSTANTS */
+#define H_BOX 0
 #define OUTER 0
 #define INNER 1
 
 /* PREFERENCES */
+#define DEFAULT_WINDOW_SIZE 273,373
 #define BORDER_WID_OUTER 10
 #define BORDER_WID_INNER 5
 #define BUG_LIST_COLS 3
@@ -103,8 +105,8 @@ int main( int argc, char **argv )
     gtk_window_set_title( GTK_WINDOW (window[OUTER]), "bugd" );
     g_signal_connect( window[OUTER], "destroy", G_CALLBACK (gtk_main_quit), NULL);
     gtk_container_set_border_width( GTK_CONTAINER (window[OUTER]), BORDER_WID_OUTER );
-
-    table[OUTER] = gtk_vbox_new (FALSE, 0);//gtk_table_new( 3, 1, FALSE );//
+    gtk_window_set_default_size( GTK_WINDOW (window[OUTER]), DEFAULT_WINDOW_SIZE );
+    table[OUTER] = gtk_vbox_new (FALSE, 0);
     gtk_container_add( GTK_CONTAINER (window[OUTER]), table[OUTER] );
 
     /* Setup Buglist Window */
@@ -112,7 +114,6 @@ int main( int argc, char **argv )
     gtk_container_set_border_width( GTK_CONTAINER (window[INNER]), BORDER_WID_INNER );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW (window[INNER]), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start( GTK_BOX (table[OUTER]), window[INNER], TRUE, TRUE, 0 );
-    //gtk_table_attach_defaults( GTK_TABLE (table[OUTER]), window[INNER], 0, 1, 0, 2 );
 
     buglist = gtk_clist_new_with_titles( BUG_LIST_COLS, buglist_col_titles );
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (window[INNER]), buglist );
@@ -123,7 +124,8 @@ int main( int argc, char **argv )
     /* Setup Button Table */
     table[INNER] = gtk_table_new( 3, 3, TRUE );
     gtk_box_pack_start( GTK_BOX (table[OUTER]), table[INNER], FALSE, TRUE, 5 );
-    //gtk_table_attach_defaults( GTK_TABLE (table[OUTER]), table[INNER], 0, 1, 2, 3 );
+    gtk_widget_show( table[OUTER] );
+    table[H_BOX] = gtk_hbox_new( TRUE, 0 ); /* Reuseing Widget Pointer [H_BOX == OUTER] */
 
     button = gtk_button_new_with_label( "Add" );
     gtk_signal_connect_object( GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC (add_bug), (gpointer) buglist );
@@ -140,14 +142,16 @@ int main( int argc, char **argv )
     gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 2, 3, 0, 1);
     gtk_widget_show (button);
 
+    gtk_table_attach_defaults(GTK_TABLE (table[INNER]), table[H_BOX], 0, 3, 1, 2);
+
     button = gtk_button_new_with_label( "Reproduce" );
     g_signal_connect( button, "clicked", G_CALLBACK (open_reproduce_window), (gpointer) buglist );
-    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 0, 1, 1, 2);
+    gtk_box_pack_start( GTK_BOX (table[H_BOX]), button, TRUE, TRUE, 0 );
     gtk_widget_show (button);
 
     button = gtk_button_new_with_label( "Behaviour" );
     g_signal_connect( button, "clicked", G_CALLBACK (open_behave_window), (gpointer) buglist );
-    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 2, 3, 1, 2);
+    gtk_box_pack_start( GTK_BOX (table[H_BOX]), button, TRUE, TRUE, 0 );
     gtk_widget_show (button);
 
     button = gtk_button_new_with_label( "Quit" );
@@ -157,8 +161,8 @@ int main( int argc, char **argv )
 
     /* Display GUI */
     gtk_widget_show( buglist );
+    gtk_widget_show( table[H_BOX] );
     gtk_widget_show( table[INNER] );
-    gtk_widget_show( table[OUTER] );
     gtk_widget_show( window[INNER] );
     gtk_widget_show( window[OUTER] );
     gtk_main ();
