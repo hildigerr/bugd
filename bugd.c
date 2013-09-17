@@ -1,3 +1,5 @@
+/* $Id: bugd.c,v 1.2 2013/09/17 15:17:06 moonsdad Exp $ */
+
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include <stdlib.h>
 #include <gtk/gtk.h>
@@ -84,7 +86,7 @@ int main( int argc, char **argv )
     GtkWidget* window[2];
     GtkWidget* table[2];
     GtkWidget* buglist;
-    GtkWidget* widget;
+    GtkWidget* button;
     gchar* buglist_col_titles[BUG_LIST_COLS] = { "ID#", "STATUS", "NAME" };
 
     sqlite3* bugdb;
@@ -102,14 +104,15 @@ int main( int argc, char **argv )
     g_signal_connect( window[OUTER], "destroy", G_CALLBACK (gtk_main_quit), NULL);
     gtk_container_set_border_width( GTK_CONTAINER (window[OUTER]), BORDER_WID_OUTER );
 
-    table[OUTER] = gtk_table_new( 3, 1, TRUE );
+    table[OUTER] = gtk_vbox_new (FALSE, 0);//gtk_table_new( 3, 1, FALSE );//
     gtk_container_add( GTK_CONTAINER (window[OUTER]), table[OUTER] );
 
     /* Setup Buglist Window */
     window[INNER] = gtk_scrolled_window_new( NULL, NULL );
     gtk_container_set_border_width( GTK_CONTAINER (window[INNER]), BORDER_WID_INNER );
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW (window[INNER]), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_table_attach_defaults( GTK_TABLE (table[OUTER]), window[INNER], 0, 1, 0, 2 );
+    gtk_box_pack_start( GTK_BOX (table[OUTER]), window[INNER], TRUE, TRUE, 0 );
+    //gtk_table_attach_defaults( GTK_TABLE (table[OUTER]), window[INNER], 0, 1, 0, 2 );
 
     buglist = gtk_clist_new_with_titles( BUG_LIST_COLS, buglist_col_titles );
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (window[INNER]), buglist );
@@ -119,37 +122,38 @@ int main( int argc, char **argv )
 
     /* Setup Button Table */
     table[INNER] = gtk_table_new( 3, 3, TRUE );
-    gtk_table_attach_defaults( GTK_TABLE (table[OUTER]), table[INNER], 0, 1, 2, 3 );
+    gtk_box_pack_start( GTK_BOX (table[OUTER]), table[INNER], FALSE, TRUE, 5 );
+    //gtk_table_attach_defaults( GTK_TABLE (table[OUTER]), table[INNER], 0, 1, 2, 3 );
 
-    widget = gtk_button_new_with_label( "Add" );
-    gtk_signal_connect_object( GTK_OBJECT(widget), "clicked", GTK_SIGNAL_FUNC (add_bug), (gpointer) buglist );
-    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), widget, 0, 1, 0, 1);
-    gtk_widget_show (widget);
+    button = gtk_button_new_with_label( "Add" );
+    gtk_signal_connect_object( GTK_OBJECT(button), "clicked", GTK_SIGNAL_FUNC (add_bug), (gpointer) buglist );
+    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 0, 1, 0, 1);
+    gtk_widget_show (button);
 
-    widget = gtk_button_new_with_label( "Fix" );
-    g_signal_connect( widget, "clicked", G_CALLBACK (change_status), (gpointer) buglist );
-    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), widget, 1, 2, 0, 1);
-    gtk_widget_show (widget);
+    button = gtk_button_new_with_label( "Fix" );
+    g_signal_connect( button, "clicked", G_CALLBACK (change_status), (gpointer) buglist );
+    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 1, 2, 0, 1);
+    gtk_widget_show (button);
 
-    widget = gtk_button_new_with_label( "Hide" );
-    g_signal_connect( widget, "clicked", G_CALLBACK (change_display_list), (gpointer) buglist );
-    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), widget, 2, 3, 0, 1);
-    gtk_widget_show (widget);
+    button = gtk_button_new_with_label( "Hide" );
+    g_signal_connect( button, "clicked", G_CALLBACK (change_display_list), (gpointer) buglist );
+    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 2, 3, 0, 1);
+    gtk_widget_show (button);
 
-    widget = gtk_button_new_with_label( "Reproduce" );
-    g_signal_connect( widget, "clicked", G_CALLBACK (open_reproduce_window), (gpointer) buglist );
-    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), widget, 0, 1, 1, 2);
-    gtk_widget_show (widget);
+    button = gtk_button_new_with_label( "Reproduce" );
+    g_signal_connect( button, "clicked", G_CALLBACK (open_reproduce_window), (gpointer) buglist );
+    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 0, 1, 1, 2);
+    gtk_widget_show (button);
 
-    widget = gtk_button_new_with_label( "Behaviour" );
-    g_signal_connect( widget, "clicked", G_CALLBACK (open_behave_window), (gpointer) buglist );
-    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), widget, 2, 3, 1, 2);
-    gtk_widget_show (widget);
+    button = gtk_button_new_with_label( "Behaviour" );
+    g_signal_connect( button, "clicked", G_CALLBACK (open_behave_window), (gpointer) buglist );
+    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 2, 3, 1, 2);
+    gtk_widget_show (button);
 
-    widget = gtk_button_new_with_label( "Quit" );
-    g_signal_connect( widget, "clicked", G_CALLBACK (gtk_main_quit), NULL );
-    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), widget, 1, 2, 2, 3);
-    gtk_widget_show (widget);
+    button = gtk_button_new_with_label( "Quit" );
+    g_signal_connect( button, "clicked", G_CALLBACK (gtk_main_quit), NULL );
+    gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 1, 2, 2, 3);
+    gtk_widget_show (button);
 
     /* Display GUI */
     gtk_widget_show( buglist );
