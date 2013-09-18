@@ -1,4 +1,4 @@
-/* $Id: bugd.c,v 1.3 2013/09/17 21:15:06 moonsdad Exp $ */
+/* $Id: bugd.c,v 1.7 2013/09/18 00:15:22 moonsdad Exp $ */
 
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include <stdlib.h>
@@ -9,6 +9,10 @@
 #define H_BOX 0
 #define OUTER 0
 #define INNER 1
+#define MENU 0
+#define _BAR 0
+#define ROOT 1
+#define ITEM 1
 
 /* PREFERENCES */
 #define DEFAULT_WINDOW_SIZE 273,373
@@ -16,12 +20,16 @@
 #define BORDER_WID_INNER 5
 #define BUG_LIST_COLS 3
 
+/* Global Variable */
+int next_keyval;
+gboolean opendb = FALSE;
+
 /******************************************************************CALLBACKS: */
 void add_bug( gpointer data )
 {
-//     int status = 0;
-//     int next_keyval;
-//     gchar* nubug[BUG_LIST_COLS] = { "0", "0", "A Bug" };
+     int status = 0;
+//     extern int next_keyval;
+     gchar* nubug[BUG_LIST_COLS] = { "0", "0", "A Bug" };
 //     GtkWidget* button, * table, * field[3];
 //
 //     GtkWidget* pop_up = gtk_window_new( GTK_WINDOW_POPUP );
@@ -39,75 +47,105 @@ void add_bug( gpointer data )
 //     gtk_widget_show( table );
 //     gtk_widget_show( pop_up );
 //
-//     gtk_clist_append( GTK_CLIST (data), nubug );
+     gtk_clist_append( GTK_CLIST (data), nubug );
 
     return;
-}
+}/* End add_bug Func */
 void change_status( gpointer data )
 {
 
     return;
-}
+}/* End change_status Func */
 void change_display_list( gpointer data )
 {
 
     return;
-}
+}/* End change_display_list Func */
 void open_reproduce_window( gpointer data )
 {
 
     return;
-}
+}/* End open_reproduce_window Func */
 void open_behave_window( gpointer data )
 {
 
     return;
-}
-/* If we come here, then the user has selected a row in the list. *///TODO
-void event_select( GtkWidget* clist, gint row, gint column, GdkEventButton* event, gpointer data )
+}/* End open_behave_window Func */
+void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, gpointer data )
 {
-    gchar *text;
+    gchar* text;
 
-    /* Get the text that is stored in the selected row and column
-     * which was clicked in. We will receive it as a pointer in the
-     * argument text.
-     */
-    gtk_clist_get_text(GTK_CLIST(clist), row, column, &text);
+    gtk_clist_get_text(GTK_CLIST(clist), row, 0, &text);
 
-    /* Just prints some information about the selected row */
-    g_print("You selected row %d. More specifically you clicked in "
-            "column %d, and the text in this cell is %s\n\n",
-            row, column, text);
+    g_print( "\nSelected Key ID# == %s\n", text );
 
     return;
-}
+}/* End event_select Func */
+void menu_file_open( sqlite3** db )
+{
+    if( opendb ) {
+        printf ("A database has already been opened.\n");
+    } else {
+        if( sqlite3_open( "test.db", db ) ) {
+            fprintf( stderr, "Can't open database: %s\n", sqlite3_errmsg(*db));
+            exit(1);
+        }/* End sqlite3_open If */
+        opendb = TRUE;
+    }/* End !opendb Else */
+}/* End menu_file_open Func */
+/******************************************************************* HELPERS: */
+GdkPixbuf* load_pixbuf( const gchar * filename )
+{
+   GdkPixbuf* pixbuf = NULL;
+   GError* error = NULL;
+
+   if( !(pixbuf = gdk_pixbuf_new_from_file( filename, &error )) ) {
+      fprintf( stderr, "\nWARNING: %s\n", error->message );
+      g_error_free( error );
+   }
+
+   return pixbuf;
+}/* End load_pixbuf Func */
 
 /********************************************************************** MAIN: */
 int main( int argc, char **argv )
 {
     GtkWidget* window[2];
     GtkWidget* table[2];
-    GtkWidget* buglist;
-    GtkWidget* button;
+    GtkWidget* menu[2];
+    GtkWidget* buglist, * button;
     gchar* buglist_col_titles[BUG_LIST_COLS] = { "ID#", "STATUS", "NAME" };
 
     sqlite3* bugdb;
-
-    if( sqlite3_open( "test.db", &bugdb ) ) {
-        fprintf( stderr, "Can't open database: %s\n", sqlite3_errmsg(bugdb));
-        exit(1);
-    }//TODO: Move to Menu->Open
 
     gtk_init( &argc, &argv );
 
     /* Setup Main Window */
     window[OUTER] = gtk_window_new( GTK_WINDOW_TOPLEVEL );
     gtk_window_set_title( GTK_WINDOW (window[OUTER]), "bugd" );
+    gtk_window_set_icon( GTK_WINDOW (window[OUTER]), load_pixbuf("icon.png"));
     g_signal_connect( window[OUTER], "destroy", G_CALLBACK (gtk_main_quit), NULL);
     gtk_container_set_border_width( GTK_CONTAINER (window[OUTER]), BORDER_WID_OUTER );
     gtk_window_set_default_size( GTK_WINDOW (window[OUTER]), DEFAULT_WINDOW_SIZE );
     table[OUTER] = gtk_vbox_new (FALSE, 0);
     gtk_container_add( GTK_CONTAINER (window[OUTER]), table[OUTER] );
+
+    /* Setup Menu */
+    menu[MENU] = gtk_menu_new();
+    menu[ITEM] = gtk_menu_item_new_with_label( "Open..." );
+    gtk_menu_shell_append( GTK_MENU_SHELL (menu[MENU]), menu[ITEM] );
+    g_signal_connect_swapped( menu[ITEM], "activate", G_CALLBACK (menu_file_open), &bugdb );
+    gtk_widget_show( menu[ITEM] );
+
+    menu[ROOT] = gtk_menu_item_new_with_label( "File" );
+    gtk_widget_show( menu[ROOT] );
+    gtk_menu_item_set_submenu( GTK_MENU_ITEM (menu[ROOT]), menu[MENU] );
+
+    menu[_BAR] = gtk_menu_bar_new();
+    gtk_box_pack_start (GTK_BOX (table[OUTER]), menu[_BAR], FALSE, FALSE, 2);
+    gtk_widget_show( menu[_BAR] );
+
+    gtk_menu_shell_append( GTK_MENU_SHELL (menu[_BAR]), menu[ROOT] );
 
     /* Setup Buglist Window */
     window[INNER] = gtk_scrolled_window_new( NULL, NULL );
