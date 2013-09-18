@@ -1,4 +1,4 @@
-/* $Id: bugd.c,v 1.7 2013/09/18 00:15:22 moonsdad Exp $ */
+/* $Id: bugd.c,v 1.9 2013/09/18 01:17:17 moonsdad Exp $ */
 
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include <stdlib.h>
@@ -16,11 +16,13 @@
 
 /* PREFERENCES */
 #define DEFAULT_WINDOW_SIZE 273,373
-#define BORDER_WID_OUTER 10
-#define BORDER_WID_INNER 5
+#define BORDER_WID_OUTER 0
+#define BORDER_WID_INNER 8
+#define BORDER_WID_TWIXT 4
 #define BUG_LIST_COLS 3
 
-/* Global Variable */
+/* Global Variables */
+sqlite3* bugdb;
 int next_keyval;
 gboolean opendb = FALSE;
 
@@ -81,18 +83,29 @@ void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, 
 
     return;
 }/* End event_select Func */
-void menu_file_open( sqlite3** db )
+void file_open_ok( GtkWidget *w, GtkFileSelection *fs )
 {
+    if( sqlite3_open( gtk_file_selection_get_filename(GTK_FILE_SELECTION (fs)), &bugdb ) )
+        fprintf( stderr, "Can't open database: %s\n", sqlite3_errmsg(bugdb));
+    else opendb = TRUE;
+}/* End file_open_ok Func */
+void menu_file_open( void )
+{
+ 	GtkWidget *filew;
+
     if( opendb ) {
         printf ("A database has already been opened.\n");
     } else {
-        if( sqlite3_open( "test.db", db ) ) {
-            fprintf( stderr, "Can't open database: %s\n", sqlite3_errmsg(*db));
-            exit(1);
-        }/* End sqlite3_open If */
-        opendb = TRUE;
+        filew = gtk_file_selection_new ("Open Bug Database");
+        gtk_signal_connect( GTK_OBJECT (filew), "destroy", (GtkSignalFunc) gtk_widget_destroy, GTK_OBJECT (filew));
+        gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION (filew)->cancel_button),  "clicked", (GtkSignalFunc) gtk_widget_destroy, GTK_OBJECT (filew));
+        gtk_signal_connect( GTK_OBJECT (GTK_FILE_SELECTION (filew)->ok_button), "clicked", (GtkSignalFunc) file_open_ok, filew );
+        gtk_signal_connect_object (GTK_OBJECT (GTK_FILE_SELECTION (filew)->ok_button),  "clicked", (GtkSignalFunc) gtk_widget_destroy, GTK_OBJECT (filew));
+        gtk_widget_show(filew);
     }/* End !opendb Else */
 }/* End menu_file_open Func */
+
+
 /******************************************************************* HELPERS: */
 GdkPixbuf* load_pixbuf( const gchar * filename )
 {
@@ -116,8 +129,6 @@ int main( int argc, char **argv )
     GtkWidget* buglist, * button;
     gchar* buglist_col_titles[BUG_LIST_COLS] = { "ID#", "STATUS", "NAME" };
 
-    sqlite3* bugdb;
-
     gtk_init( &argc, &argv );
 
     /* Setup Main Window */
@@ -134,7 +145,7 @@ int main( int argc, char **argv )
     menu[MENU] = gtk_menu_new();
     menu[ITEM] = gtk_menu_item_new_with_label( "Open..." );
     gtk_menu_shell_append( GTK_MENU_SHELL (menu[MENU]), menu[ITEM] );
-    g_signal_connect_swapped( menu[ITEM], "activate", G_CALLBACK (menu_file_open), &bugdb );
+    g_signal_connect_swapped( menu[ITEM], "activate", G_CALLBACK (menu_file_open), NULL );
     gtk_widget_show( menu[ITEM] );
 
     menu[ROOT] = gtk_menu_item_new_with_label( "File" );
@@ -161,7 +172,7 @@ int main( int argc, char **argv )
 
     /* Setup Button Table */
     table[INNER] = gtk_table_new( 3, 3, TRUE );
-    gtk_box_pack_start( GTK_BOX (table[OUTER]), table[INNER], FALSE, TRUE, 5 );
+    gtk_box_pack_start( GTK_BOX (table[OUTER]), table[INNER], FALSE, TRUE, BORDER_WID_TWIXT );
     gtk_widget_show( table[OUTER] );
     table[H_BOX] = gtk_hbox_new( TRUE, 0 ); /* Reuseing Widget Pointer [H_BOX == OUTER] */
 
@@ -205,6 +216,6 @@ int main( int argc, char **argv )
     gtk_widget_show( window[OUTER] );
     gtk_main ();
 
-    sqlite3_close(bugdb);
+    if( opendb ) sqlite3_close(bugdb);
     return 0;
 }/* End main Func */
