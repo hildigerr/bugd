@@ -1,12 +1,12 @@
-/* $Id: datab.c,v 1.1 2013/09/19 03:48:12 moonsdad Exp $ */
+/* $Id: datab.c,v 1.3 2013/09/19 06:04:17 moonsdad Exp $ */
 #include "bugd.h"
 
-/* Global Variables */
-extern sqlite3* bugdb;
-extern gboolean opendb;
 
-
-
+/******************************************************************************/
+/* Function:   event_select                                                   */
+/* Parameters: */
+/* WARNING: */
+/******************************************************************************/
 void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, gpointer data )
 {
     gchar* text;
@@ -18,6 +18,12 @@ void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, 
     return;
 }/* End event_select Func */
 
+
+/******************************************************************************/
+/* Function:   change_status                                                  */
+/* Parameters: gpointer data*/
+/* WARNING: */
+/******************************************************************************/
 void change_status( gpointer data )
 {
 

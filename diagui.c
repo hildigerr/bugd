@@ -1,18 +1,26 @@
-/* $Id: diagui.c,v 1.1 2013/09/19 03:48:12 moonsdad Exp $ */
+/* $Id: diagui.c,v 1.5 2013/09/19 06:04:17 moonsdad Exp $ */
 #include "bugd.h"
 
-/* Global Variables */
-extern sqlite3* bugdb;
-extern gboolean opendb;
 
+#define DB_FIELD_QT 5
 
+#define BORDER_WID_TEXTF 6
+#define DEFAULT_POPUP_SIZE 360,620
+
+/******************************************************************************/
+/* Function:   add_bug                                                        */
+/* Parameters: gpointer data                                                  */
+/******************************************************************************/
 void add_bug( gpointer data )//TODO: Change text entry boxes into textbuffers with views
 {
-    int i, status = 0;
-    extern int next_keyval;
+    extern unsigned next_keyval;
+    extern gboolean opendb;
+    int i;
+
     gchar* nubug[BUG_LIST_COLS] = { "0", "0", "A Bug" };
-    GtkWidget* box[2], * field[3];
+    GtkWidget* box[2], * field[DB_FIELD_QT];
     GtkWidget* pop_up, * button;
+    GtkTextBuffer* buffer[DB_FIELD_QT];
 
     if( !opendb ) { menu_file_open(); return; } /*TODO: Temp: Using "Add" opens db only, if unopen
     //if( !opendb ) return; /* Don't Continue if Failed or Canceled */// Does't continue on success.
@@ -20,54 +28,59 @@ void add_bug( gpointer data )//TODO: Change text entry boxes into textbuffers wi
 
     pop_up = gtk_window_new( GTK_WINDOW_TOPLEVEL );
     gtk_window_set_title( GTK_WINDOW(pop_up), "Report a Bug" );
-    gtk_container_set_border_width( GTK_CONTAINER (pop_up), 0 );
+    gtk_container_set_border_width( GTK_CONTAINER (pop_up), 12 );
+    gtk_window_set_default_size( GTK_WINDOW (pop_up), DEFAULT_POPUP_SIZE );
 
     box[0] = gtk_vbox_new( FALSE, 0 );
     gtk_container_add( GTK_CONTAINER (pop_up), box[0] );
 
-    for( i = 0; i < 3; i++ ) field[i] = gtk_entry_new( );
+    for( i = 0; i < DB_FIELD_QT; i++ ) {
+        field[i] = gtk_text_view_new();
+        buffer[i] = gtk_text_view_get_buffer( GTK_TEXT_VIEW (field[i]) );
+    }
 
     box[1] = gtk_hbox_new( FALSE, 0 );
-    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , FALSE, FALSE, BORDER_WID_TWIXT);
+    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , FALSE, FALSE, BORDER_WID_TEXTF);
     button = gtk_label_new("NAME: "); /* Not A Button */
-    gtk_box_pack_start( GTK_BOX (box[1]), button, FALSE, FALSE, BORDER_WID_TWIXT);
-    gtk_box_pack_start( GTK_BOX (box[1]), field[0], TRUE, TRUE, BORDER_WID_TWIXT);
+    gtk_box_pack_start( GTK_BOX (box[1]), button, FALSE, FALSE, BORDER_WID_TEXTF);
+    gtk_box_pack_start( GTK_BOX (box[1]), field[0], TRUE, TRUE, BORDER_WID_TEXTF);
     gtk_widget_show( button );
     gtk_widget_show( box[1] );
 
-    box[1] = gtk_frame_new( "Expectation:" );
-    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , TRUE, TRUE, BORDER_WID_TWIXT);
+    box[1] = gtk_frame_new( "Expectation:" );//This is where you put a description of what you expect to be happening.
+    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , TRUE, TRUE, BORDER_WID_TEXTF);
     gtk_container_add( GTK_CONTAINER (box[1]), field[1]);
     gtk_widget_show( box[1] );
 
-    box[1] = gtk_frame_new( "Behavior:" );
-    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , TRUE, TRUE, BORDER_WID_TWIXT);
+    box[1] = gtk_frame_new( "Behavior:" );//Describe what is actually happening.
+    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , TRUE, TRUE, BORDER_WID_TEXTF);
     gtk_container_add( GTK_CONTAINER (box[1]), field[2]);
     gtk_widget_show( box[1] );
 
-//TRING TO MAKE TEXTBOX FILL FRAME:
-//     box[1] = gtk_frame_new( "Behavior:" );
-//     gtk_box_pack_start( GTK_BOX (box[0]), box[1] , TRUE, TRUE, BORDER_WID_TWIXT);
-//     button = gtk_table_new( 1,1,TRUE ); /* Not A Button */
-//     gtk_container_add( GTK_CONTAINER (box[1]), button );
-//     gtk_table_attach_defaults( GTK_TABLE (button), field[2],0,1,0,1 );
-//     gtk_widget_show( button );
-//     gtk_widget_show( box[1] );
+    box[1] = gtk_frame_new( "Reproduce:" );//Provide instructions for reproducing the issue.
+    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , TRUE, TRUE, BORDER_WID_TEXTF);
+    gtk_container_add( GTK_CONTAINER (box[1]), field[3]);
+    gtk_widget_show( box[1] );
+
+    box[1] = gtk_frame_new( "Notes:" );//This is a workspace. Eg: Who is assigned to work on this problem
+    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , TRUE, TRUE, BORDER_WID_TEXTF);
+    gtk_container_add( GTK_CONTAINER (box[1]), field[4]);
+    gtk_widget_show( box[1] );
 
     box[1] = gtk_hbox_new( FALSE, 0 );
-    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , FALSE, FALSE, BORDER_WID_TWIXT);
+    gtk_box_pack_start( GTK_BOX (box[0]), box[1] , FALSE, FALSE, BORDER_WID_TEXTF);
     button = gtk_button_new_with_label( "Submit" );
     //gtk_signal_connect( GTK_OBJECT (button), "clicked", (GtkSignalFunc) submit_bug, GTK_OBJECT (field) );
-    gtk_box_pack_end( GTK_BOX (box[1]), button , FALSE, FALSE, BORDER_WID_TWIXT);
+    gtk_box_pack_end( GTK_BOX (box[1]), button , FALSE, FALSE, BORDER_WID_TEXTF);
     gtk_widget_show( button );
     button = gtk_button_new_with_label( "Cancel" );
     gtk_signal_connect( GTK_OBJECT (button), "clicked", (GtkSignalFunc) close_window, GTK_OBJECT (pop_up) );
-    gtk_box_pack_end( GTK_BOX (box[1]), button , FALSE, FALSE, BORDER_WID_TWIXT);
+    gtk_box_pack_end( GTK_BOX (box[1]), button , FALSE, FALSE, BORDER_WID_TEXTF);
     gtk_widget_show( button );
 
     gtk_widget_show( box[1] );
 
-    for( i = 0; i < 3; i++ ) gtk_widget_show( field[i] );
+    for( i = 0; i < DB_FIELD_QT; i++ ) gtk_widget_show( field[i] );
     gtk_widget_show( box[0] );
     gtk_widget_show( pop_up );
 
@@ -75,17 +88,36 @@ void add_bug( gpointer data )//TODO: Change text entry boxes into textbuffers wi
 
 }/* End add_bug Func */
 
-/***********************************************************************TODO: */
+
+/******************************************************************************/
+/* Function:   change_display_list                                            */
+/* Parameters: gpointer data*/
+/* WARNING: */
+/******************************************************************************/
 void change_display_list( gpointer data )
 {
 
     return;
 }/* End change_display_list Func */
+
+
+/******************************************************************************/
+/* Function:   open_reproduce_window                                          */
+/* Parameters: gpointer data*/
+/* WARNING: */
+/******************************************************************************/
 void open_reproduce_window( gpointer data )
 {
 
     return;
 }/* End open_reproduce_window Func */
+
+
+/******************************************************************************/
+/* Function:   open_behave_window                                             */
+/* Parameters: gpointer data*/
+/* WARNING: */
+/******************************************************************************/
 void open_behave_window( gpointer data )
 {
 
@@ -93,8 +125,13 @@ void open_behave_window( gpointer data )
 }/* End open_behave_window Func */
 
 
-
 /******************************************************************* HELPERS: */
+/******************************************************************************/
+/* Function:    load_pixbuf                                                   */
+/* Parameters:  const gchar ptr filename */
+/* Returns:     GdkPixbuf ptr */
+/* WARNING: On Fail, just uses default img and displays warning in terminal.  */
+/******************************************************************************/
 GdkPixbuf* load_pixbuf( const gchar * filename )
 {
    GdkPixbuf* pixbuf = NULL;
