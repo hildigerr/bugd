@@ -1,17 +1,18 @@
 
 CC = gcc
 CFLAGS = -g -Wall
-CONFIG = -l sqlite3 `pkg-config --cflags --libs gtk+-2.0`
+LFLAGS = -l sqlite3
+CONFIG = `pkg-config --cflags --libs gtk+-2.0`
 
-SRCS = bugd.c
-INSTALL_DIR = ~/PROGRAMING/bin/
+SRCS = menu.c diagui.c datab.c bugd.c
+# INSTALL_DIR = ~/PROGRAMING/bin/
 
 bugd : ${SRCS}
-	${CC} ${SRCS} -o ${@} ${CONFIG}
+	${CC} ${SRCS} -o ${@} ${LFLAGS} ${CONFIG}
 
 clean:
 	rm bugd
 
-install: bugd
-	cp bugd ${INSTALL_DIR}
+# install: bugd
+# 	cp bugd ${INSTALL_DIR}
 
