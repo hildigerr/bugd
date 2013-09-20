@@ -1,4 +1,4 @@
-/* $Id: diagui.c,v 1.5 2013/09/19 06:04:17 moonsdad Exp $ */
+/* $Id: diagui.c,v 1.6 2013/09/20 02:26:10 moonsdad Exp $ */
 #include "bugd.h"
 
 
@@ -13,7 +13,6 @@
 /******************************************************************************/
 void add_bug( gpointer data )//TODO: Change text entry boxes into textbuffers with views
 {
-    extern unsigned next_keyval;
     extern gboolean opendb;
     int i;
 

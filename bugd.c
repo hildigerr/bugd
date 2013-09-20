@@ -1,4 +1,4 @@
-/* $Id: bugd.c,v 1.15 2013/09/19 05:20:26 moonsdad Exp $ */
+/* $Id: bugd.c,v 1.16 2013/09/20 02:26:10 moonsdad Exp $ */
 
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include "bugd.h"
@@ -14,7 +14,7 @@
 
 /* Global Variables */
 sqlite3* bugdb;
-unsigned next_keyval;
+unsigned select_keyval;
 gboolean opendb = FALSE;
 
 /********************************************************************** MAIN: */

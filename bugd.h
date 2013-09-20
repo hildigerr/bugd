@@ -1,4 +1,4 @@
-/* $Id: bugd.h,v 1.1 2013/09/19 03:48:11 moonsdad Exp $ */
+/* $Id: bugd.h,v 1.2 2013/09/20 02:26:10 moonsdad Exp $ */
 #pragma once
 
 #include <stdlib.h>
@@ -33,3 +33,5 @@ void file_open_ok( GtkWidget *w, GtkFileSelection *fs );
 /* Helpers and Wrappers */
 GdkPixbuf* load_pixbuf( const gchar * filename );
 
+
+int load_open_datab( void* pArg, int argc, char** argv, char** columnNames );

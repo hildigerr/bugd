@@ -1,4 +1,4 @@
-/* $Id: datab.c,v 1.3 2013/09/19 06:04:17 moonsdad Exp $ */
+/* $Id: datab.c,v 1.4 2013/09/20 02:26:10 moonsdad Exp $ */
 #include "bugd.h"
 
 
@@ -29,3 +29,31 @@ void change_status( gpointer data )
 
     return;
 }/* End change_status Func */
+
+/******************************************************************************/
+/* Function:   load_open_datab                                                */
+/* Parameters: void* pArg, int argc, char** argv, char** columnNames */
+/* Returns:     int    -   SQLite API expects this to be 0, Aborts otherwise. */
+/* WARNING: */
+/******************************************************************************/
+int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
+{
+   int i;
+   for( i = 0; i < argc; i++ ) {
+      printf("%s = %s\n", columnNames[i], argv[i] ? argv[i] : "NULL");
+   }
+
+   return 0;
+}/* End load_open_datab Func */
+
+
+/******************************************************************************/
+/* Function:    */
+/* Parameters: void* pArg, int argc, char** argv, char** columnNames */
+/* Returns:     int    -   SQLite API expects this to be 0, Aborts otherwise. */
+/* WARNING: */
+/******************************************************************************/
+// int Callback( void* pArg, int argc, char** argv, char** columnNames )
+// {
+//   return 0;
+// }/* End Func */

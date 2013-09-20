@@ -1,4 +1,4 @@
-/* $Id: menu.c,v 1.4 2013/09/19 06:04:17 moonsdad Exp $ */
+/* $Id: menu.c,v 1.5 2013/09/20 02:26:10 moonsdad Exp $ */
 #include "bugd.h"
 
 
@@ -30,15 +30,22 @@ void menu_file_open( void )
 /* Parameters: GtkWidget ptr w, GtkFileSelection ptr fs */
 /* WARNING: */
 /******************************************************************************/
-void file_open_ok( GtkWidget *w, GtkFileSelection *fs )//TODO: Verify valid selection
+void file_open_ok( GtkWidget *w, GtkFileSelection *fs )
 {
-    extern unsigned next_keyval; //TODO Get and Set after Opendb
+    char* statement = "SELECT * FROM bug_list";
+
     extern sqlite3* bugdb;
     extern gboolean opendb;
+    char* errmsg;
+
 
     if( sqlite3_open( gtk_file_selection_get_filename(GTK_FILE_SELECTION (fs)), &bugdb ) )
         fprintf( stderr, "Can't open database: %s\n", sqlite3_errmsg(bugdb));
     else opendb = TRUE;
+
+    sqlite3_exec( bugdb, statement, load_open_datab, NULL, &errmsg );
+
+    if( errmsg ) fprintf( stderr, "\n%s\n", errmsg );//TODO: Init New DB
 }/* End file_open_ok Func */
 
 
