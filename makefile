@@ -8,7 +8,7 @@ SRCS = menu.c diagui.c datab.c bugd.c
 # INSTALL_DIR = ~/PROGRAMING/bin/
 
 bugd : ${SRCS}
-	${CC} ${SRCS} -o ${@} ${LFLAGS} ${CONFIG}
+	${CC} ${CFLAGS} ${SRCS} -o ${@} ${LFLAGS} ${CONFIG}
 
 clean:
 	rm bugd

@@ -1,9 +1,11 @@
-/* $Id: bugd.h,v 1.2 2013/09/20 02:26:10 moonsdad Exp $ */
+/* $Id: bugd.h,v 1.3 2013/09/20 18:01:50 moonsdad Exp $ */
 #pragma once
 
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <sqlite3.h>
+
+#define DB_FIELD_QT 5
 
 /* PREFERENCES */// TODO: Dynamize
 #define DEFAULT_WINDOW_SIZE 273,373
@@ -11,6 +13,8 @@
 #define BORDER_WID_INNER 8
 #define BORDER_WID_TWIXT 4
 #define BUG_LIST_COLS 3
+
+typedef struct { GtkWidget* field[DB_FIELD_QT]; } FIELD_LIST;
 
 /* Main Button Callbacks */
 void add_bug( gpointer data );
@@ -29,6 +33,7 @@ void menu_file_close( void );
 /* Dialoge Box Buttons */
 void close_window(GtkWidget *widget, gpointer window);
 void file_open_ok( GtkWidget *w, GtkFileSelection *fs );
+void submit_bug( );//FIELD_LIST* my );
 
 /* Helpers and Wrappers */
 GdkPixbuf* load_pixbuf( const gchar * filename );
