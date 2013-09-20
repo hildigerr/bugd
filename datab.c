@@ -1,4 +1,4 @@
-/* $Id: datab.c,v 1.4 2013/09/20 02:26:10 moonsdad Exp $ */
+/* $Id: datab.c,v 1.5 2013/09/20 04:50:38 moonsdad Exp $ */
 #include "bugd.h"
 
 
@@ -10,10 +10,13 @@
 void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, gpointer data )
 {
     gchar* text;
+    extern int select_keyval;
 
     gtk_clist_get_text(GTK_CLIST(clist), row, 0, &text);
 
     g_print( "\nSelected Key ID# == %s\n", text );
+
+
 
     return;
 }/* End event_select Func */
@@ -38,12 +41,17 @@ void change_status( gpointer data )
 /******************************************************************************/
 int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
 {
-   int i;
-   for( i = 0; i < argc; i++ ) {
-      printf("%s = %s\n", columnNames[i], argv[i] ? argv[i] : "NULL");
-   }
+    extern GtkWidget* buglist;
+    gchar* abug[] = { argv[0], argv[6], argv[1] };
 
-   return 0;
+    int i;
+    for( i = 0; i < argc; i++ ) {
+        printf("%s = %s\n", columnNames[i], argv[i] ? argv[i] : "NULL");
+    }
+
+    gtk_clist_append( GTK_CLIST (buglist), abug );
+
+    return 0;
 }/* End load_open_datab Func */
 
 

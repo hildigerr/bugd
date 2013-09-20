@@ -1,4 +1,4 @@
-/* $Id: bugd.c,v 1.16 2013/09/20 02:26:10 moonsdad Exp $ */
+/* $Id: bugd.c,v 1.17 2013/09/20 04:50:38 moonsdad Exp $ */
 
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include "bugd.h"
@@ -14,8 +14,9 @@
 
 /* Global Variables */
 sqlite3* bugdb;
-unsigned select_keyval;
+int select_keyval = 0;
 gboolean opendb = FALSE;
+GtkWidget* buglist;
 
 /********************************************************************** MAIN: */
 int main( int argc, char **argv )
@@ -23,7 +24,7 @@ int main( int argc, char **argv )
     GtkWidget* window[2];
     GtkWidget* table[2];
     GtkWidget* menu[2];
-    GtkWidget* buglist, * button;
+    GtkWidget* button;
     gchar* buglist_col_titles[BUG_LIST_COLS] = { "ID#", "STATUS", "NAME" };
 
     gtk_init( &argc, &argv );

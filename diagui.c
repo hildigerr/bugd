@@ -1,4 +1,4 @@
-/* $Id: diagui.c,v 1.6 2013/09/20 02:26:10 moonsdad Exp $ */
+/* $Id: diagui.c,v 1.7 2013/09/20 04:50:39 moonsdad Exp $ */
 #include "bugd.h"
 
 
@@ -16,7 +16,7 @@ void add_bug( gpointer data )//TODO: Change text entry boxes into textbuffers wi
     extern gboolean opendb;
     int i;
 
-    gchar* nubug[BUG_LIST_COLS] = { "0", "0", "A Bug" };
+    //gchar* nubug[BUG_LIST_COLS] = { "0", "0", "A Bug" };
     GtkWidget* box[2], * field[DB_FIELD_QT];
     GtkWidget* pop_up, * button;
     GtkTextBuffer* buffer[DB_FIELD_QT];
@@ -83,7 +83,7 @@ void add_bug( gpointer data )//TODO: Change text entry boxes into textbuffers wi
     gtk_widget_show( box[0] );
     gtk_widget_show( pop_up );
 
-    gtk_clist_append( GTK_CLIST (data), nubug );
+    //gtk_clist_append( GTK_CLIST (data), nubug );
 
 }/* End add_bug Func */
 
