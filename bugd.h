@@ -1,4 +1,4 @@
-/* $Id: bugd.h,v 1.3 2013/09/20 18:01:50 moonsdad Exp $ */
+/* $Id: bugd.h,v 1.4 2013/09/21 01:56:57 moonsdad Exp $ */
 #pragma once
 
 #include <stdlib.h>
@@ -15,6 +15,8 @@
 #define BUG_LIST_COLS 3
 
 typedef struct { GtkWidget* field[DB_FIELD_QT]; } FIELD_LIST;
+
+enum { ID_COL, STATUS_COL, NAME_COL, LIST_COL_QT };
 
 /* Main Button Callbacks */
 void add_bug( gpointer data );
@@ -40,3 +42,5 @@ GdkPixbuf* load_pixbuf( const gchar * filename );
 
 
 int load_open_datab( void* pArg, int argc, char** argv, char** columnNames );
+
+GtkWidget* init_list( void );

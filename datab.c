@@ -1,4 +1,4 @@
-/* $Id: datab.c,v 1.8 2013/09/20 21:27:23 moonsdad Exp $ */
+/* $Id: datab.c,v 1.9 2013/09/21 01:56:57 moonsdad Exp $ */
 #include "bugd.h"
 
 //TODO: use sqlite_freemem() where necessary
@@ -71,7 +71,7 @@ void submit_bug( )//FIELD_LIST* my )
 //        sqlite3_reset(ppStmt);
     } else g_print("\nERROR: preparing sqlite stmt\n");
 
-
+//TODO: SELECT Id, Status, Name FROM bug_List WHERE
 
 //     sqlite_exec_printf( bugdb, "INSERT INTO bug_list( Name, Reproduce, Expectation, Behavior, Notes, Status ) VALUES('%s','%s','%s','%s','%s',0)", NULL, NULL, &errmsg,
 //         gtk_text_buffer_get_text( buffer[0], &start_iter[0], &end_iter[0], FALSE ),
@@ -104,16 +104,29 @@ void change_status( gpointer data )
 /******************************************************************************/
 int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
 {
-    extern GtkWidget* buglist;
-    gchar* abug[] = { argv[0], argv[6], argv[1] };
+    extern GtkListStore* buglist;
+    //gchar* abug[] = { argv[0], argv[6], argv[1] };//TODO: ReFormat Query
+    GtkTreeIter iter;
 
     int i;
     for( i = 0; i < argc; i++ ) {
         printf("%s = %s\n", columnNames[i], argv[i] ? argv[i] : "NULL");
     }
 
-    gtk_clist_append( GTK_CLIST (buglist), abug );
+    //gtk_clist_append( GTK_CLIST (buglist), abug );
 
+    gtk_list_store_append( buglist, &iter );
+    gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[6], NAME_COL, argv[1], -1 );
+    return 0;
+}/* End load_open_datab Func */
+
+int load_list_datab( void* pArg, int argc, char** argv, char** columnNames )
+{
+    extern GtkListStore* buglist;
+    GtkTreeIter iter;
+
+    gtk_list_store_append( buglist, &iter );
+    gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[1], NAME_COL, argv[2], -1 );
     return 0;
 }/* End load_open_datab Func */
 

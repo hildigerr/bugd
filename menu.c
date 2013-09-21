@@ -1,4 +1,4 @@
-/* $Id: menu.c,v 1.6 2013/09/20 05:12:49 moonsdad Exp $ */
+/* $Id: menu.c,v 1.7 2013/09/21 01:56:57 moonsdad Exp $ */
 #include "bugd.h"
 
 
@@ -60,10 +60,12 @@ void menu_file_close( void )
 {
     extern sqlite3* bugdb;
     extern gboolean opendb;
+    extern GtkListStore* buglist;
 
     if( opendb ) sqlite3_close(bugdb);
     else printf("\nNo database open.\n");
     opendb = FALSE;
+    gtk_list_store_clear( buglist );
 }/* End menu_file_close Func */
 
 

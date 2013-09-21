@@ -1,4 +1,4 @@
-/* $Id: bugd.c,v 1.18 2013/09/20 18:01:50 moonsdad Exp $ */
+/* $Id: bugd.c,v 1.19 2013/09/21 01:56:57 moonsdad Exp $ */
 
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include "bugd.h"
@@ -13,11 +13,11 @@
 #define ITEM 1
 
 /* Global Variables */
+FIELD_LIST fl;
 sqlite3* bugdb;
 int select_keyval = 0;
 gboolean opendb = FALSE;
-GtkWidget* buglist;
-FIELD_LIST fl;
+GtkListStore* buglist;// = gtk_tree_store_new( LIST_COL_QT, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING );
 
 /********************************************************************** MAIN: */
 int main( int argc, char **argv )
@@ -26,7 +26,7 @@ int main( int argc, char **argv )
     GtkWidget* table[2];
     GtkWidget* menu[2];
     GtkWidget* button;
-    gchar* buglist_col_titles[BUG_LIST_COLS] = { "ID#", "STATUS", "NAME" };
+//    gchar* buglist_col_titles[BUG_LIST_COLS] = { "ID#", "STATUS", "NAME" };
     int i;
 
     gtk_init( &argc, &argv );
@@ -81,11 +81,14 @@ int main( int argc, char **argv )
     gtk_scrolled_window_set_policy( GTK_SCROLLED_WINDOW (window[INNER]), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_box_pack_start( GTK_BOX (table[OUTER]), window[INNER], TRUE, TRUE, 0 );
 
-    buglist = gtk_clist_new_with_titles( BUG_LIST_COLS, buglist_col_titles );
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (window[INNER]), buglist );
-    gtk_clist_set_column_justification( GTK_CLIST (buglist), 0, GTK_JUSTIFY_CENTER );
-    gtk_clist_set_column_justification( GTK_CLIST (buglist), 1, GTK_JUSTIFY_CENTER );
-    gtk_signal_connect( GTK_OBJECT(buglist), "select_row", GTK_SIGNAL_FUNC(event_select), NULL );
+//     buglist = gtk_clist_new_with_titles( BUG_LIST_COLS, buglist_col_titles );
+//     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (window[INNER]), buglist );
+//     gtk_clist_set_column_justification( GTK_CLIST (buglist), 0, GTK_JUSTIFY_CENTER );
+//     gtk_clist_set_column_justification( GTK_CLIST (buglist), 1, GTK_JUSTIFY_CENTER );
+//     gtk_signal_connect( GTK_OBJECT(buglist), "select_row", GTK_SIGNAL_FUNC(event_select), NULL );
+
+    buglist = gtk_list_store_new( LIST_COL_QT, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING );
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (window[INNER]), init_list( ) );
 
     /* Setup Button Table */
     table[INNER] = gtk_table_new( 3, 3, TRUE );
@@ -126,11 +129,12 @@ int main( int argc, char **argv )
     gtk_widget_show (button);
 
     /* Display GUI */
-    gtk_widget_show( buglist );
+    //gtk_widget_show( buglist );
     gtk_widget_show( table[H_BOX] );
     gtk_widget_show( table[INNER] );
     gtk_widget_show( window[INNER] );
     gtk_widget_show( window[OUTER] );
+
     gtk_main ();
 
     if( opendb ) sqlite3_close(bugdb);
