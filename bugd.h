@@ -1,9 +1,11 @@
-/* $Id: bugd.h,v 1.7 2013/09/21 15:30:41 moonsdad Exp $ */
+/* $Id: bugd.h,v 1.9 2013/09/21 18:43:50 moonsdad Exp $ */
 #pragma once
 
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <sqlite3.h>
+
+#define DEBUG
 
 #define DB_FIELD_QT 5
 
@@ -18,11 +20,11 @@ typedef struct { GtkWidget* field[DB_FIELD_QT]; } FIELD_LIST;
 enum { ID_COL, STATUS_COL, NAME_COL, LIST_COL_QT };
 
 /* Main Button Callbacks */
-void add_bug( gpointer data );
+void add_bug( void );
 void change_status( gpointer b, gpointer data );
-void change_display_list( gpointer data );
-void open_reproduce_window( gpointer data );
-void open_behave_window( gpointer data );
+void change_display_list( gpointer b, gpointer data );
+void open_reproduce_window( gpointer b, gpointer data );
+void open_behave_window( gpointer b, gpointer data );
 
 /* Menu Callbacks */
 void menu_file_open( void );
@@ -34,7 +36,6 @@ void file_open_ok( GtkWidget *w, GtkFileSelection *fs );
 void submit_bug( );//FIELD_LIST* my );
 
 /* Bug List Store Functions */
-//void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, gpointer data );
 GtkWidget* init_list( void );
 int load_open_datab( void* pArg, int argc, char** argv, char** columnNames );
 

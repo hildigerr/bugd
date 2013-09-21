@@ -1,28 +1,8 @@
-/* $Id: datab.c,v 1.13 2013/09/21 15:30:41 moonsdad Exp $ */
+/* $Id: datab.c,v 1.15 2013/09/21 18:43:50 moonsdad Exp $ */
 #include "bugd.h"
 
 //TODO: use sqlite_freemem() where necessary            and:
 //    char* errmsg;//    if( errmsg ) fprintf( stderr, "\nERROR:%s\n", errmsg );
-
-// /******************************************************************************/
-// /* Function:   event_select                                                   */
-// /* Parameters: */
-// /* WARNING: */
-// /******************************************************************************/
-// void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, gpointer data )
-// {
-//     gchar* text;
-//     extern int select_keyval;
-//
-//     gtk_clist_get_text(GTK_CLIST(clist), row, 0, &text);
-//
-//     select_keyval = atoi(text);
-//
-//     g_print( "\nSelected Key ID# == %s == %d\n", text, select_keyval );
-//
-//     return;
-// }/* End event_select Func */
-
 
 /******************************************************************************/
 /* Function:   submit_bug                                                     */
@@ -45,10 +25,14 @@ void submit_bug( void )
     for( i = 0; i < DB_FIELD_QT; i++ ) {
         buffer[i] = gtk_text_view_get_buffer( GTK_TEXT_VIEW (fl.field[i]) );
         if( buffer[i] ) {
-            g_print( "\nGot buffer %d from field\n", i );
+            #ifdef DEBUG
+                g_print( "\nGot buffer %d from field\n", i );
+            #endif
             gtk_text_buffer_get_start_iter( buffer[i], &start_iter[i] );
             gtk_text_buffer_get_end_iter( buffer[i], &end_iter[i] );
-            g_print("\n%s\n", gtk_text_buffer_get_text( buffer[i], &start_iter[i], &end_iter[i], FALSE ));
+            #ifdef DEBUG
+                g_print("\n%s\n", gtk_text_buffer_get_text( buffer[i], &start_iter[i], &end_iter[i], FALSE ));
+            #endif
         } else {
             g_print( "\nERROR: Failed to get buffer %d from field\n", i );
         }
@@ -81,14 +65,14 @@ void submit_bug( void )
         sqlite3_finalize(ppStmt);
     } else g_print("\nERROR: preparing sqlite stmt\n");
 
-}
+}/* End submit_bug Func */
 
 
 /******************************************************************************/
 /* Function:   change_status                                                  */
-/* Parameters: gpointer data*/
-/* WARNING: */    /* This will only work in single or browse selection mode! */
-/* TODO: Allow variable status values with user defined meanings
+/* Parameters: gpointer data                                                  */
+/* WARNING:     This will only work in single or browse selection mode!       */
+/* TODO: Allow variable status values with user defined meanings              */
 /******************************************************************************/
 void change_status( gpointer b, gpointer data )
 {
@@ -113,7 +97,7 @@ void change_status( gpointer b, gpointer data )
         } else g_print("\nERROR: preparing sqlite stmt\n");
 
         g_free( Id ); g_free( status );
-    } else g_print ("no row selected.\n");
+    } else g_print( "no row selected.\n" );
 
 }/* End change_status Func */
 
@@ -129,12 +113,11 @@ int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
     //gchar* abug[] = { argv[0], argv[6], argv[1] };//TODO: ReFormat Query
     GtkTreeIter iter;
 
-    int i;
-    for( i = 0; i < argc; i++ ) {
-        printf("%s = %s\n", columnNames[i], argv[i] ? argv[i] : "NULL");
-    }
-
-    //gtk_clist_append( GTK_CLIST (buglist), abug );
+    #ifdef DEBUG
+        int i;
+        for( i = 0; i < argc; i++ )
+            printf("%s = %s\n", columnNames[i], argv[i] ? argv[i] : "NULL");
+    #endif
 
     gtk_list_store_append( buglist, &iter );
     gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[6], NAME_COL, argv[1], -1 );

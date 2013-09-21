@@ -1,4 +1,4 @@
-/* $Id: bugd.c,v 1.24 2013/09/21 06:57:00 moonsdad Exp $ */
+/* $Id: bugd.c,v 1.25 2013/09/21 15:56:29 moonsdad Exp $ */
 
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include "bugd.h"
@@ -82,7 +82,6 @@ int main( int argc, char **argv )
     gtk_box_pack_start( GTK_BOX (table[OUTER]), window[INNER], TRUE, TRUE, 0 );
 
     buglist = gtk_list_store_new( LIST_COL_QT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING );
-//     gtk_signal_connect( GTK_OBJECT(buglist), "select_row", GTK_SIGNAL_FUNC(event_select), NULL );
     view = gtk_tree_view_new_with_model( GTK_TREE_MODEL (buglist) );
 //     gtk_clist_set_column_justification( GTK_CLIST (buglist), 0, GTK_JUSTIFY_CENTER );
 //     gtk_clist_set_column_justification( GTK_CLIST (buglist), 1, GTK_JUSTIFY_CENTER );

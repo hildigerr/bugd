@@ -1,4 +1,4 @@
-/* $Id: diagui.c,v 1.12 2013/09/21 06:57:00 moonsdad Exp $ */
+/* $Id: diagui.c,v 1.16 2013/09/21 21:25:25 moonsdad Exp $ */
 #include "bugd.h"
 
 #define BORDER_WID_TEXTF 6
@@ -7,8 +7,9 @@
 /******************************************************************************/
 /* Function:   add_bug                                                        */
 /* Parameters: gpointer data                                                  */
+/* WARNING: Only one instance of this open at a time. TODO: Enforce           */
 /******************************************************************************/
-void add_bug( gpointer data )
+void add_bug( void )
 {
     extern FIELD_LIST fl;
     extern gboolean opendb;
@@ -59,7 +60,7 @@ void add_bug( gpointer data )
     box[1] = gtk_hbox_new( FALSE, 0 );
     gtk_box_pack_start( GTK_BOX (box[0]), box[1] , FALSE, FALSE, BORDER_WID_TEXTF);
     button = gtk_button_new_with_label( "Submit" );
-    gtk_signal_connect( GTK_OBJECT (button), "clicked", (GtkSignalFunc) submit_bug, NULL);
+    gtk_signal_connect( GTK_OBJECT (button), "clicked", (GtkSignalFunc) submit_bug, NULL );
     gtk_signal_connect( GTK_OBJECT (button), "clicked", (GtkSignalFunc) close_window, GTK_OBJECT (pop_up) );
     gtk_box_pack_end( GTK_BOX (box[1]), button , FALSE, FALSE, BORDER_WID_TEXTF);
     gtk_widget_show( button );
@@ -82,7 +83,7 @@ void add_bug( gpointer data )
 /* Parameters: gpointer data*/
 /* WARNING: */
 /******************************************************************************/
-void change_display_list( gpointer data )
+void change_display_list( gpointer b, gpointer data )
 {
 
     return;
@@ -94,10 +95,57 @@ void change_display_list( gpointer data )
 /* Parameters: gpointer data*/
 /* WARNING: */
 /******************************************************************************/
-void open_reproduce_window( gpointer data )
+void open_reproduce_window( gpointer b, gpointer data )//(gchar *message)
 {
+    extern sqlite3* bugdb;
+    extern GtkListStore* buglist;
+    GtkTreeModel* Buglist = GTK_TREE_MODEL(buglist);/*Get Rid of Warning*/
 
-    return;
+    GtkTreeIter iter;
+
+    GtkTreeSelection* selection = gtk_tree_view_get_selection( GTK_TREE_VIEW (data) );
+    if( gtk_tree_selection_get_selected( selection, &Buglist, &iter ) ) {
+        /* Local Variables */
+        gchar* bug_name, * Id;
+        sqlite3_stmt* ppStmt;
+
+        gtk_tree_model_get( GTK_TREE_MODEL (buglist), &iter, NAME_COL, &bug_name, ID_COL, &Id, -1 );
+
+        if( sqlite3_prepare_v2( bugdb, "SELECT Reproduce FROM bug_List WHERE Id = ?", -1, &ppStmt, NULL ) == SQLITE_OK ) {
+            int errn = sqlite3_bind_text( ppStmt, 1, Id, -1, NULL );
+            if( errn != SQLITE_OK ) {
+                g_print( "\nERROR: binding sqlite stmt part failed with Error #%d\n", errn );
+            } else {
+                if( sqlite3_step(ppStmt) == SQLITE_ROW ) {
+                    /* Local Variables */
+                    GtkTextIter text_iter;
+                    GtkWidget* field, * dialog, * content_area, * box;
+                    GtkTextBuffer * buff;
+                    int i;
+
+                    field = gtk_text_view_new();
+                    gtk_text_view_set_editable( GTK_TEXT_VIEW (field), FALSE );
+                    gtk_text_view_set_cursor_visible( GTK_TEXT_VIEW (field), FALSE );
+
+                    dialog = gtk_dialog_new_with_buttons( bug_name, NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, NULL );
+                    content_area = gtk_dialog_get_content_area( GTK_DIALOG (dialog) );
+                    g_signal_connect_swapped( dialog, "response", G_CALLBACK (gtk_widget_destroy), dialog );
+                    gtk_window_set_default_size( GTK_WINDOW (dialog), DEFAULT_POPUP_SIZE );
+
+                    box = gtk_frame_new( "Reproduce:" );
+                    gtk_container_add( GTK_CONTAINER (content_area), box );
+                    gtk_container_add( GTK_CONTAINER (box), field );
+                    buff = gtk_text_view_get_buffer( GTK_TEXT_VIEW (field) );
+                    gtk_text_buffer_get_start_iter( buff, &text_iter );
+                    gtk_text_buffer_insert( buff, &text_iter, sqlite3_column_text( ppStmt, 0 ), -1 );
+
+                    gtk_widget_show_all( dialog );
+                } else g_print( "\nERROR: Bug ID not found in database!\n" );
+            }/* End ppStmt bind ok Else */
+            sqlite3_finalize(ppStmt);/* Clean Up */
+        } else g_print("\nERROR: preparing sqlite stmt\n");
+        g_free( bug_name ); g_free( Id );/* Clean Up */
+    } else g_print( "no row selected.\n" );
 }/* End open_reproduce_window Func */
 
 
@@ -106,10 +154,73 @@ void open_reproduce_window( gpointer data )
 /* Parameters: gpointer data*/
 /* WARNING: */
 /******************************************************************************/
-void open_behave_window( gpointer data )
+void open_behave_window( gpointer b, gpointer data )
 {
+    extern sqlite3* bugdb;
+    extern GtkListStore* buglist;
+    GtkTreeModel* Buglist = GTK_TREE_MODEL(buglist);/*Get Rid of Warning*/
 
-    return;
+    GtkTreeIter iter;
+
+    GtkTreeSelection* selection = gtk_tree_view_get_selection( GTK_TREE_VIEW (data) );
+    if( gtk_tree_selection_get_selected( selection, &Buglist, &iter ) ) {
+        /* Local Variables */
+        gchar* bug_name, * Id;
+        sqlite3_stmt* ppStmt;
+
+        gtk_tree_model_get( GTK_TREE_MODEL (buglist), &iter, NAME_COL, &bug_name, ID_COL, &Id, -1 );
+
+        if( sqlite3_prepare_v2( bugdb, "SELECT Expectation, Behavior, Notes FROM bug_List WHERE Id = ?", -1, &ppStmt, NULL ) == SQLITE_OK ) {
+            int errn = sqlite3_bind_text( ppStmt, 1, Id, -1, NULL );
+            if( errn != SQLITE_OK ) {
+                g_print( "\nERROR: binding sqlite stmt part failed with Error #%d\n", errn );
+            } else {
+                if( sqlite3_step(ppStmt) == SQLITE_ROW ) {
+                    /* Local Variables */
+                    GtkTextIter text_iter;
+                    GtkWidget* field[3], * dialog, * content_area, * box;
+                    GtkTextBuffer * buff;
+                    int i;
+
+                    for( i = 0; i < 3; i++ ) {
+                        field[i] = gtk_text_view_new();
+                        gtk_text_view_set_editable( GTK_TEXT_VIEW (field[i]), FALSE );
+                        gtk_text_view_set_cursor_visible( GTK_TEXT_VIEW (field[i]), FALSE );
+                    }
+
+                    dialog = gtk_dialog_new_with_buttons( bug_name, NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, NULL );
+                    content_area = gtk_dialog_get_content_area( GTK_DIALOG (dialog) );
+                    g_signal_connect_swapped( dialog, "response", G_CALLBACK (gtk_widget_destroy), dialog );
+                    gtk_window_set_default_size( GTK_WINDOW (dialog), DEFAULT_POPUP_SIZE );
+
+                    box = gtk_frame_new( "Expectation:" );
+                    gtk_container_add( GTK_CONTAINER (content_area), box );
+                    gtk_container_add( GTK_CONTAINER (box), field[0] );
+                    buff = gtk_text_view_get_buffer( GTK_TEXT_VIEW (field[0]) );
+                    gtk_text_buffer_get_start_iter( buff, &text_iter );
+                    gtk_text_buffer_insert( buff, &text_iter, sqlite3_column_text( ppStmt, 0 ), -1 );
+
+                    box = gtk_frame_new( "Behavior:" );
+                    gtk_container_add( GTK_CONTAINER (content_area), box );
+                    gtk_container_add( GTK_CONTAINER (box), field[1] );
+                    buff = gtk_text_view_get_buffer( GTK_TEXT_VIEW (field[1]) );
+                    gtk_text_buffer_get_start_iter( buff, &text_iter );
+                    gtk_text_buffer_insert( buff, &text_iter, sqlite3_column_text( ppStmt, 1 ), -1 );
+
+                    box = gtk_frame_new( "Notes:" );
+                    gtk_container_add( GTK_CONTAINER (content_area), box );
+                    gtk_container_add( GTK_CONTAINER (box), field[2] );
+                    buff = gtk_text_view_get_buffer( GTK_TEXT_VIEW (field[2]) );
+                    gtk_text_buffer_get_start_iter( buff, &text_iter );
+                    gtk_text_buffer_insert( buff, &text_iter, sqlite3_column_text( ppStmt, 2 ), -1 );
+
+                    gtk_widget_show_all( dialog );
+                } else g_print( "\nERROR: Bug ID not found in database!\n" );
+            }/* End ppStmt bind ok Else */
+            sqlite3_finalize(ppStmt);/* Clean Up */
+        } else g_print("\nERROR: preparing sqlite stmt\n");
+        g_free( bug_name ); g_free( Id );/* Clean Up */
+    } else g_print( "no row selected.\n" );
 }/* End open_behave_window Func */
 
 
