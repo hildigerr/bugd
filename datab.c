@@ -1,33 +1,31 @@
-/* $Id: datab.c,v 1.11 2013/09/21 06:12:48 moonsdad Exp $ */
+/* $Id: datab.c,v 1.13 2013/09/21 15:30:41 moonsdad Exp $ */
 #include "bugd.h"
 
 //TODO: use sqlite_freemem() where necessary            and:
 //    char* errmsg;//    if( errmsg ) fprintf( stderr, "\nERROR:%s\n", errmsg );
 
+// /******************************************************************************/
+// /* Function:   event_select                                                   */
+// /* Parameters: */
+// /* WARNING: */
+// /******************************************************************************/
+// void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, gpointer data )
+// {
+//     gchar* text;
+//     extern int select_keyval;
+//
+//     gtk_clist_get_text(GTK_CLIST(clist), row, 0, &text);
+//
+//     select_keyval = atoi(text);
+//
+//     g_print( "\nSelected Key ID# == %s == %d\n", text, select_keyval );
+//
+//     return;
+// }/* End event_select Func */
+
+
 /******************************************************************************/
-/* Function:   event_select                                                   */
-/* Parameters: */
-/* WARNING: */
-/******************************************************************************/
-void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, gpointer data )
-{
-    gchar* text;
-    extern int select_keyval;
-
-    gtk_clist_get_text(GTK_CLIST(clist), row, 0, &text);
-
-    select_keyval = atoi(text);
-
-    g_print( "\nSelected Key ID# == %s == %d\n", text, select_keyval );
-
-    return;
-}/* End event_select Func */
-
-
-/******************************************************************************/
-/* Function:   submit_bug                                                   */
-/* Parameters: */
-/* WARNING: */
+/* Function:   submit_bug                                                     */
 /******************************************************************************/
 void submit_bug( void )
 {
@@ -89,12 +87,34 @@ void submit_bug( void )
 /******************************************************************************/
 /* Function:   change_status                                                  */
 /* Parameters: gpointer data*/
-/* WARNING: */
+/* WARNING: */    /* This will only work in single or browse selection mode! */
+/* TODO: Allow variable status values with user defined meanings
 /******************************************************************************/
-void change_status( gpointer data )
+void change_status( gpointer b, gpointer data )
 {
+    extern GtkListStore* buglist;
+    extern sqlite3* bugdb;
+    GtkTreeIter iter;
+    sqlite3_stmt* ppStmt; int errn;
+    GtkTreeModel* Buglist = GTK_TREE_MODEL(buglist);/*Get Rid of Warning*/
 
-    return;
+    GtkTreeSelection* selection = gtk_tree_view_get_selection( GTK_TREE_VIEW (data) );
+    if( gtk_tree_selection_get_selected( selection, &Buglist, &iter ) ) {
+        gchar* Id, * status;
+        gtk_tree_model_get( GTK_TREE_MODEL (buglist), &iter, ID_COL, &Id, STATUS_COL, &status, -1 );
+        gtk_list_store_set( buglist, &iter, STATUS_COL,( status[0] == '0' )? "1":"0" , -1 );
+
+        if( sqlite3_prepare_v2( bugdb, "UPDATE bug_list SET Status = ? WHERE Id = ?", -1, &ppStmt, NULL ) == SQLITE_OK ) {
+            errn = sqlite3_bind_text( ppStmt, 1, ( status[0] == '0' )? "1":"0" , -1, NULL );
+            errn = sqlite3_bind_text( ppStmt, 2, Id , -1, NULL );
+            if(  errn != SQLITE_OK ) g_print( "\nERROR: binding sqlite stmt part failed with Error #%d\n", errn );
+            else sqlite3_step(ppStmt);
+            sqlite3_finalize(ppStmt);
+        } else g_print("\nERROR: preparing sqlite stmt\n");
+
+        g_free( Id ); g_free( status );
+    } else g_print ("no row selected.\n");
+
 }/* End change_status Func */
 
 /******************************************************************************/
@@ -122,17 +142,17 @@ int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
 }/* End load_open_datab Func */
 
 
-/******************************************************************************/
-/******************************************************************************/
-int load_list_datab( void* pArg, int argc, char** argv, char** columnNames )
-{
-    extern GtkListStore* buglist;
-    GtkTreeIter iter;
-
-    gtk_list_store_append( buglist, &iter );
-    gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[1], NAME_COL, argv[2], -1 );
-    return 0;
-}/* End load_list_datab Func */
+// /******************************************************************************/
+// /******************************************************************************/
+// int load_list_datab( void* pArg, int argc, char** argv, char** columnNames )
+// {
+//     extern GtkListStore* buglist;
+//     GtkTreeIter iter;
+//
+//     gtk_list_store_append( buglist, &iter );
+//     gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[1], NAME_COL, argv[2], -1 );
+//     return 0;
+// }/* End load_list_datab Func */
 
 
 /******************************************************************************/

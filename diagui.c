@@ -1,4 +1,4 @@
-/* $Id: diagui.c,v 1.11 2013/09/21 04:21:05 moonsdad Exp $ */
+/* $Id: diagui.c,v 1.12 2013/09/21 06:57:00 moonsdad Exp $ */
 #include "bugd.h"
 
 #define BORDER_WID_TEXTF 6
@@ -116,8 +116,8 @@ void open_behave_window( gpointer data )
 /******************************************************************* HELPERS: */
 /******************************************************************************/
 /* Function:    load_pixbuf                                                   */
-/* Parameters:  const gchar ptr filename */
-/* Returns:     GdkPixbuf ptr */
+/* Parameters:  const gchar ptr     filename    -- Immage to load             */
+/* Returns:     GdkPixbuf ptr                   -- The loaded immage          */
 /* WARNING: On Fail, just uses default img and displays warning in terminal.  */
 /******************************************************************************/
 GdkPixbuf* load_pixbuf( const gchar * filename )

@@ -1,4 +1,4 @@
-/* $Id: bugd.h,v 1.5 2013/09/21 04:21:05 moonsdad Exp $ */
+/* $Id: bugd.h,v 1.7 2013/09/21 15:30:41 moonsdad Exp $ */
 #pragma once
 
 #include <stdlib.h>
@@ -19,7 +19,7 @@ enum { ID_COL, STATUS_COL, NAME_COL, LIST_COL_QT };
 
 /* Main Button Callbacks */
 void add_bug( gpointer data );
-void change_status( gpointer data );
+void change_status( gpointer b, gpointer data );
 void change_display_list( gpointer data );
 void open_reproduce_window( gpointer data );
 void open_behave_window( gpointer data );
@@ -34,7 +34,7 @@ void file_open_ok( GtkWidget *w, GtkFileSelection *fs );
 void submit_bug( );//FIELD_LIST* my );
 
 /* Bug List Store Functions */
-void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, gpointer data );
+//void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, gpointer data );
 GtkWidget* init_list( void );
 int load_open_datab( void* pArg, int argc, char** argv, char** columnNames );
 
