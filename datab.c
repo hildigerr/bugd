@@ -1,4 +1,4 @@
-/* $Id: datab.c,v 1.9 2013/09/21 01:56:57 moonsdad Exp $ */
+/* $Id: datab.c,v 1.10 2013/09/21 04:21:05 moonsdad Exp $ */
 #include "bugd.h"
 
 //TODO: use sqlite_freemem() where necessary
@@ -15,11 +15,9 @@ void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, 
 
     gtk_clist_get_text(GTK_CLIST(clist), row, 0, &text);
 
-    //g_print( "\nSelected Key ID# == %s", text );
-
     select_keyval = atoi(text);
 
-    g_print( "\nSelected Key ID# == %d\n", select_keyval );
+    g_print( "\nSelected Key ID# == %s == %d\n", text, select_keyval );
 
     return;
 }/* End event_select Func */
@@ -30,7 +28,7 @@ void event_select( GtkWidget* clist, gint row, gint col, GdkEventButton* event, 
 /* Parameters: */
 /* WARNING: */
 /******************************************************************************/
-void submit_bug( )//FIELD_LIST* my )
+void submit_bug( void )
 {
     extern FIELD_LIST fl;
     extern sqlite3* bugdb;
@@ -68,18 +66,9 @@ void submit_bug( )//FIELD_LIST* my )
         }
         sqlite3_step(ppStmt);
         sqlite3_finalize(ppStmt);
-//        sqlite3_reset(ppStmt);
     } else g_print("\nERROR: preparing sqlite stmt\n");
 
 //TODO: SELECT Id, Status, Name FROM bug_List WHERE
-
-//     sqlite_exec_printf( bugdb, "INSERT INTO bug_list( Name, Reproduce, Expectation, Behavior, Notes, Status ) VALUES('%s','%s','%s','%s','%s',0)", NULL, NULL, &errmsg,
-//         gtk_text_buffer_get_text( buffer[0], &start_iter[0], &end_iter[0], FALSE ),
-//         gtk_text_buffer_get_text( buffer[1], &start_iter[1], &end_iter[1], FALSE ),
-//         gtk_text_buffer_get_text( buffer[2], &start_iter[2], &end_iter[2], FALSE ),
-//         gtk_text_buffer_get_text( buffer[3], &start_iter[3], &end_iter[3], FALSE ),
-//         gtk_text_buffer_get_text( buffer[4], &start_iter[4], &end_iter[4], FALSE )
-//     );
 
 //    if( errmsg ) fprintf( stderr, "\nERROR:%s\n", errmsg );
 }
@@ -120,6 +109,9 @@ int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
     return 0;
 }/* End load_open_datab Func */
 
+
+/******************************************************************************/
+/******************************************************************************/
 int load_list_datab( void* pArg, int argc, char** argv, char** columnNames )
 {
     extern GtkListStore* buglist;
@@ -128,7 +120,7 @@ int load_list_datab( void* pArg, int argc, char** argv, char** columnNames )
     gtk_list_store_append( buglist, &iter );
     gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[1], NAME_COL, argv[2], -1 );
     return 0;
-}/* End load_open_datab Func */
+}/* End load_list_datab Func */
 
 
 /******************************************************************************/

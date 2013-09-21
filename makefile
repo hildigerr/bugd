@@ -4,7 +4,7 @@ CFLAGS = -g -Wall
 LFLAGS = -l sqlite3
 CONFIG = `pkg-config --cflags --libs gtk+-2.0`
 
-SRCS = blist.c menu.c diagui.c datab.c bugd.c
+SRCS = menu.c diagui.c datab.c bugd.c
 # INSTALL_DIR = ~/PROGRAMING/bin/
 
 bugd : ${SRCS}

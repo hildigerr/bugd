@@ -1,4 +1,4 @@
-/* $Id: diagui.c,v 1.10 2013/09/20 21:27:23 moonsdad Exp $ */
+/* $Id: diagui.c,v 1.11 2013/09/21 04:21:05 moonsdad Exp $ */
 #include "bugd.h"
 
 #define BORDER_WID_TEXTF 6
@@ -10,14 +10,11 @@
 /******************************************************************************/
 void add_bug( gpointer data )
 {
-    extern gboolean opendb;
-    int i;
-
-    //gchar* nubug[BUG_LIST_COLS] = { "0", "0", "A Bug" };
     extern FIELD_LIST fl;
-    GtkWidget* box[2];//, * field[DB_FIELD_QT];
+    extern gboolean opendb;
+    GtkWidget* box[2];
     GtkWidget* pop_up, * button;
-    //GtkTextBuffer* buffer[DB_FIELD_QT];
+    int i;
 
     if( !opendb ) { menu_file_open(); return; } //TODO: Temp: Using "Add" opens db only, if unopen
     //if( !opendb ) return; /* Don't Continue if Failed or Canceled */// Does't continue on success.
@@ -30,11 +27,6 @@ void add_bug( gpointer data )
 
     box[0] = gtk_vbox_new( FALSE, 0 );
     gtk_container_add( GTK_CONTAINER (pop_up), box[0] );
-
-//     for( i = 0; i < DB_FIELD_QT; i++ ) {
-//         fl.field[i] = gtk_text_view_new();
-//         //buffer[i] = gtk_text_view_get_buffer( GTK_TEXT_VIEW (field[i]) );
-//     }
 
     box[1] = gtk_hbox_new( FALSE, 0 );
     gtk_box_pack_start( GTK_BOX (box[0]), box[1] , FALSE, FALSE, BORDER_WID_TEXTF);
@@ -67,7 +59,7 @@ void add_bug( gpointer data )
     box[1] = gtk_hbox_new( FALSE, 0 );
     gtk_box_pack_start( GTK_BOX (box[0]), box[1] , FALSE, FALSE, BORDER_WID_TEXTF);
     button = gtk_button_new_with_label( "Submit" );
-    gtk_signal_connect( GTK_OBJECT (button), "clicked", (GtkSignalFunc) submit_bug, NULL);//(gpointer) &fl );
+    gtk_signal_connect( GTK_OBJECT (button), "clicked", (GtkSignalFunc) submit_bug, NULL);
     gtk_signal_connect( GTK_OBJECT (button), "clicked", (GtkSignalFunc) close_window, GTK_OBJECT (pop_up) );
     gtk_box_pack_end( GTK_BOX (box[1]), button , FALSE, FALSE, BORDER_WID_TEXTF);
     gtk_widget_show( button );
@@ -81,8 +73,6 @@ void add_bug( gpointer data )
     for( i = 0; i < DB_FIELD_QT; i++ ) gtk_widget_show( fl.field[i] );
     gtk_widget_show( box[0] );
     gtk_widget_show( pop_up );
-
-    //gtk_clist_append( GTK_CLIST (data), nubug );
 
 }/* End add_bug Func */
 
