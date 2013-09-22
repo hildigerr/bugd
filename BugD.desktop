@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=BugD
+Exec=bugd
+Comment=Bug Tracking
+Icon=/usr/share/icons/bugd.png
+NoDisplay=false
+Categories=Development;
+Type=Application
