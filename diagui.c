@@ -1,4 +1,4 @@
-/* $Id: diagui.c,v 1.21 2013/09/22 05:15:10 moonsdad Exp $ */
+/* $Id: diagui.c,v 1.22 2013/09/22 07:21:29 moonsdad Exp $ */
 #include "bugd.h"
 
 #define BORDER_WID_TEXTF 6
@@ -21,7 +21,10 @@ void add_bug( void )
     //if( !opendb ) return; /* Don't Continue if Failed or Canceled */// Does't continue on success.
     //why == Control reaches here before file is opened.
 
-    for( i = 0; i < DB_FIELD_QT; i++ ) fl.field[i] = gtk_text_view_new();
+    for( i = 0; i < DB_FIELD_QT; i++ ) {
+        fl.field[i] = gtk_text_view_new();
+        gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW (fl.field[i]), GTK_WRAP_WORD );
+    }
 
     pop_up = gtk_window_new( GTK_WINDOW_TOPLEVEL );
     gtk_window_set_title( GTK_WINDOW(pop_up), "Report a Bug" );
@@ -118,7 +121,10 @@ void modify_select_bug( gpointer b, gpointer data )
                     GtkTextBuffer * buff;
                     int i;
 
-                    for( i = 0; i < DB_FIELD_QT; i++ ) fl.field[i] = gtk_text_view_new();
+                        for( i = 0; i < DB_FIELD_QT; i++ ) {
+                            fl.field[i] = gtk_text_view_new();
+                            gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW (fl.field[i]), GTK_WRAP_WORD );
+                        }
 
                     dialog =  gtk_dialog_new();
                     gtk_window_set_title( GTK_WINDOW (dialog), bug_name );
@@ -211,6 +217,7 @@ void open_reproduce_window( gpointer b, gpointer data )
                     field = gtk_text_view_new();
                     gtk_text_view_set_editable( GTK_TEXT_VIEW (field), FALSE );
                     gtk_text_view_set_cursor_visible( GTK_TEXT_VIEW (field), FALSE );
+                    gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW (field), GTK_WRAP_WORD );
 
                     dialog = gtk_dialog_new_with_buttons( bug_name, NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, NULL );
                     content_area = gtk_dialog_get_content_area( GTK_DIALOG (dialog) );
@@ -271,6 +278,7 @@ void open_behave_window( gpointer b, gpointer data )
                         field[i] = gtk_text_view_new();
                         gtk_text_view_set_editable( GTK_TEXT_VIEW (field[i]), FALSE );
                         gtk_text_view_set_cursor_visible( GTK_TEXT_VIEW (field[i]), FALSE );
+                        gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW (field[i]), GTK_WRAP_WORD );
                     }
 
                     dialog = gtk_dialog_new_with_buttons( bug_name, NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CLOSE, NULL );
