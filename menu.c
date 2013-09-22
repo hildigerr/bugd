@@ -1,4 +1,4 @@
-/* $Id: menu.c,v 1.8 2013/09/21 06:57:00 moonsdad Exp $ */
+/* $Id: menu.c,v 1.9 2013/09/22 01:40:08 moonsdad Exp $ */
 #include "bugd.h"
 
 
@@ -15,7 +15,7 @@ void menu_file_open( void )
     extern gboolean opendb;
 
     if( opendb ) {
-        printf("\nA database has already been opened.\n");
+        g_print( "\nA database has already been opened.\n" );
     } else {
         filew = gtk_file_selection_new( "Open Bug Database" );
         gtk_file_selection_complete(  GTK_FILE_SELECTION (filew), "*.db" );
@@ -50,9 +50,13 @@ void file_open_ok( GtkWidget *w, GtkFileSelection *fs )
     sqlite3_exec( bugdb, statement, load_open_datab, NULL, &errmsg );
 
     if( errmsg ) {
-        fprintf( stderr, "\n%s\nCreating new table...", errmsg );
+        fprintf( stderr, "\nWARNING: %s. Creating new table...", errmsg );
+        sqlite3_free( errmsg );
         sqlite3_exec( bugdb, "create table bug_list( Id INTEGER PRIMARY KEY, Name TEXT, Reproduce TEXT, Expectation TEXT, Behavior TEXT, Notes TEXT, Status INTEGER )", NULL, NULL, &errmsg );
-        if( errmsg ) fprintf( stderr, "\n%s\n", errmsg );
+        if( errmsg ) {
+            fprintf( stderr, "\n%s\n", errmsg );
+            sqlite3_free( errmsg );
+        }
     }
 }/* End file_open_ok Func */
 

@@ -1,4 +1,4 @@
-/* $Id: bugd.c,v 1.25 2013/09/21 15:56:29 moonsdad Exp $ */
+/* $Id: bugd.c,v 1.26 2013/09/22 01:40:08 moonsdad Exp $ */
 
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include "bugd.h"
@@ -30,8 +30,6 @@ int main( int argc, char **argv )
     int i;
 
     gtk_init( &argc, &argv );
-
-    for( i = 0; i < DB_FIELD_QT; i++ ) fl.field[i] = gtk_text_view_new();
 
     /* Setup Main Window */
     window[OUTER] = gtk_window_new( GTK_WINDOW_TOPLEVEL );
@@ -109,8 +107,8 @@ int main( int argc, char **argv )
     gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 1, 2, 0, 1 );
     gtk_widget_show( button );
 
-    button = gtk_button_new_with_label( "Hide" );
-    g_signal_connect( button, "clicked", G_CALLBACK (change_display_list), (gpointer) view );
+    button = gtk_button_new_with_label( "Edit" );
+    g_signal_connect( button, "clicked", G_CALLBACK (modify_select_bug), (gpointer) view );
     gtk_table_attach_defaults( GTK_TABLE (table[INNER]), button, 2, 3, 0, 1 );
     gtk_widget_show( button );
 

@@ -1,8 +1,5 @@
-/* $Id: datab.c,v 1.15 2013/09/21 18:43:50 moonsdad Exp $ */
+/* $Id: datab.c,v 1.16 2013/09/22 01:40:08 moonsdad Exp $ */
 #include "bugd.h"
-
-//TODO: use sqlite_freemem() where necessary            and:
-//    char* errmsg;//    if( errmsg ) fprintf( stderr, "\nERROR:%s\n", errmsg );
 
 /******************************************************************************/
 /* Function:   submit_bug                                                     */

@@ -1,11 +1,11 @@
-/* $Id: bugd.h,v 1.9 2013/09/21 18:43:50 moonsdad Exp $ */
+/* $Id: bugd.h,v 1.11 2013/09/22 01:40:08 moonsdad Exp $ */
 #pragma once
 
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <sqlite3.h>
 
-#define DEBUG
+//#define DEBUG
 
 #define DB_FIELD_QT 5
 
@@ -22,7 +22,7 @@ enum { ID_COL, STATUS_COL, NAME_COL, LIST_COL_QT };
 /* Main Button Callbacks */
 void add_bug( void );
 void change_status( gpointer b, gpointer data );
-void change_display_list( gpointer b, gpointer data );
+void modify_select_bug( gpointer b, gpointer data );
 void open_reproduce_window( gpointer b, gpointer data );
 void open_behave_window( gpointer b, gpointer data );
 
@@ -33,7 +33,7 @@ void menu_file_close( void );
 /* Dialoge Box Buttons */
 void close_window(GtkWidget *widget, gpointer window);
 void file_open_ok( GtkWidget *w, GtkFileSelection *fs );
-void submit_bug( );//FIELD_LIST* my );
+void submit_bug( void );
 
 /* Bug List Store Functions */
 GtkWidget* init_list( void );
