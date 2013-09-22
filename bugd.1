@@ -1,0 +1,28 @@
+.TH BUGD 1 2013-09-21
+.SH NAME
+bugd \- simple bug tracking program providing a GTK interface to a SQLite3 database.
+.SH DESCRIPTION
+This graphical bug tracker was created in order to learn GTK and the C API for SQLite,
+and for use with school assignments and personal projects. It is called
+.B bugd
+for "bug database."
+So far, you can open/create a database, load it with bug reports, change their status
+between 0 and 1, and view/edit the report's data.
+.SH NOTES
+Bug Reports in the database consist of:
+.IP Id
+INTEGER PRIMARY KEY,
+.IP Name
+TEXT,   This must be unique for each bug reported (for now)
+.IP Reproduce
+TEXT,   Provide instructions for reproducing the issue.
+.IP Expectation
+TEXT,   This is where you put a description of what you expect to be happening.
+.IP Behavior
+TEXT,   Describe what is actually happening.
+.IP Notes
+TEXT,   This is for anything else (Eg: Who is assigned to work on this problem).
+.IP Status
+INTEGER 0 == opened ; 1 == solved
+.SH AUTHOR
+R.M. HildigerR Vergaray <moonsdad AT gmail>

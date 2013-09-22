@@ -1,0 +1,1 @@
+A simple bug tracking program providing a GTK interface to a SQLite3 database. It was created in order for the author to learn the GTK and SQLite C APIs, and for use with school assignments and personal projects.

@@ -20,4 +20,5 @@ Bug Reports in the database consist of:
     <li> Status INTEGER      -- 0 == opened ; 1 == solved</li>
 </ul>
 
-
+The current Icon is from:
+http://findicons.com/icon/203378/bug_buddy?id=204799
