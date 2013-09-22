@@ -4,5 +4,4 @@
 -Make list headings clickable with functions to sort by Id or Name and to Hide solved bugs
 -Ability to DELETE bugs from the list altogether (maybe log them in a file just in case)
 -Test vs. Injections
--Open database when passed as CL parameter
 -Allow a database to be Opened With

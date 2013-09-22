@@ -1,4 +1,4 @@
-/* $Id: bugd.c,v 1.27 2013/09/22 06:37:39 moonsdad Exp $ */
+/* $Id: bugd.c,v 1.28 2013/09/22 15:56:54 moonsdad Exp $ */
 
 /* bugd - A simple Bug Database interface using SQLite and GTK */
 #include "bugd.h"
@@ -18,6 +18,41 @@ sqlite3* bugdb;
 int select_keyval = 0;
 gboolean opendb = FALSE;
 GtkListStore* buglist;
+
+/******************************************************************************/
+/* Function:    cl_open         -- Open file passed through command line      */
+/* Parameters:  char ptr    fp  -- File Path                                  */
+/* Returns:     gboolean                                                      */
+/******************************************************************************/
+gboolean cl_open( char* fp )
+{
+    char* statement[] = {
+        "SELECT Id, Status, Name FROM bug_list",
+        "create table bug_list( Id INTEGER PRIMARY KEY, Name TEXT, Reproduce TEXT, Expectation TEXT, Behavior TEXT, Notes TEXT, Status INTEGER )"
+    };
+
+    extern sqlite3* bugdb;
+    extern gboolean opendb;
+    char* errmsg;
+
+    if( sqlite3_open( fp, &bugdb ) ) {
+        fprintf( stderr, "Can't open database: %s\n", sqlite3_errmsg(bugdb));
+    } else {
+        opendb = TRUE;
+
+        sqlite3_exec( bugdb, statement[0], load_open_datab, NULL, &errmsg );
+
+        if( errmsg ) { /* Assume Fails because database is New */
+            fprintf( stderr, "\nWARNING: %s. Creating new table...", errmsg );
+            sqlite3_free( errmsg );
+            sqlite3_exec( bugdb, statement[1], NULL, NULL, &errmsg );
+            if( errmsg ) {
+                fprintf( stderr, "\n%s\n", errmsg );
+                sqlite3_free( errmsg );
+            }/* End Create Table Err If */
+        }/* End New DB If */
+    } return opendb;
+}/* End cl_open Func */
 
 /********************************************************************** MAIN: */
 int main( int argc, char **argv )
@@ -134,6 +169,10 @@ int main( int argc, char **argv )
     gtk_widget_show( table[INNER] );
     gtk_widget_show( window[INNER] );
     gtk_widget_show( window[OUTER] );
+
+    /* Open File via Command Line Parameter */
+    for ( i = 1; i < argc; i++ )
+        if(( argv[i][0] != '-' )&&( cl_open(argv[i]) )) break;
 
     gtk_main();
 
