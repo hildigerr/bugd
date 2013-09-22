@@ -1,4 +1,4 @@
-/* $Id: datab.c,v 1.16 2013/09/22 01:40:08 moonsdad Exp $ */
+/* $Id: datab.c,v 1.19 2013/09/22 04:40:55 moonsdad Exp $ */
 #include "bugd.h"
 
 /******************************************************************************/
@@ -35,7 +35,7 @@ void submit_bug( void )
         }
     }
 
-    if( sqlite3_prepare_v2( bugdb, "INSERT INTO bug_list( Name, Reproduce, Expectation, Behavior, Notes, Status ) VALUES(?,?,?,?,?,0)", -1, &ppStmt, NULL ) == SQLITE_OK ) {
+    if( sqlite3_prepare_v2( bugdb, "INSERT INTO bug_list( Name, Expectation, Behavior, Reproduce, Notes, Status ) VALUES(?,?,?,?,?,0)", -1, &ppStmt, NULL ) == SQLITE_OK ) {
         for( i = 0; i < DB_FIELD_QT; i++ ) {
             errn = sqlite3_bind_text( ppStmt,(i+1), gtk_text_buffer_get_text( buffer[i], &start_iter[i], &end_iter[i], FALSE ), -1, NULL );
             if(  errn != SQLITE_OK ) {
@@ -98,6 +98,62 @@ void change_status( gpointer b, gpointer data )
 
 }/* End change_status Func */
 
+
+/******************************************************************************/
+/* Function:    update_db                                                     */
+/* Parameters: gpointer b, gchar* data */
+/* WARNING:     Must cleanup data to prevent memory leak. */
+/******************************************************************************/
+void update_db( gpointer b, gchar* data )
+{
+    extern FIELD_LIST fl;
+    extern sqlite3* bugdb;
+
+    GtkTextBuffer* buffer[DB_FIELD_QT];
+    GtkTextIter start_iter[DB_FIELD_QT];
+    GtkTextIter end_iter[DB_FIELD_QT];
+
+    sqlite3_stmt* ppStmt;
+    int i, errn;
+
+    for( i = 1; i < DB_FIELD_QT; i++ ) {
+        buffer[i] = gtk_text_view_get_buffer( GTK_TEXT_VIEW (fl.field[i]) );
+        if( buffer[i] ) {
+            #ifdef DEBUG
+                g_print( "\nGot buffer %d from field\n", i );
+            #endif
+            gtk_text_buffer_get_start_iter( buffer[i], &start_iter[i] );
+            gtk_text_buffer_get_end_iter( buffer[i], &end_iter[i] );
+            #ifdef DEBUG
+                g_print("\n%s\n", gtk_text_buffer_get_text( buffer[i], &start_iter[i], &end_iter[i], FALSE ));
+            #endif
+        } else {
+            g_print( "\nERROR: Failed to get buffer %d from field\n", i );
+        }
+    }
+
+    if( sqlite3_prepare_v2( bugdb, "UPDATE bug_list SET Expectation = ?, Behavior = ?, Reproduce = ?, Notes = ? WHERE Id = ?", -1, &ppStmt, NULL ) == SQLITE_OK ) {
+        for( i = 1; i < DB_FIELD_QT; i++ ) {
+            errn = sqlite3_bind_text( ppStmt, i, gtk_text_buffer_get_text( buffer[i], &start_iter[i], &end_iter[i], FALSE ), -1, NULL );
+            if(  errn != SQLITE_OK ) {
+                g_print( "\nERROR: binding sqlite stmt part ?%d failed with Error #%d\n" , i+1, errn );
+                sqlite3_finalize(ppStmt);
+                g_free(data);
+                return;
+            }/* End !OK If */
+        }/* End i For */
+        errn = sqlite3_bind_text( ppStmt, i, data, -1, NULL ); /* (i == DB_FIELD_QT) from for-loop , data is Id */
+        if( errn == SQLITE_OK ) {
+            if( sqlite3_step(ppStmt) != SQLITE_DONE ) g_print("\nERROR: step failed: %s\n", sqlite3_errmsg(bugdb) );
+        } else g_print( "\nERROR: binding sqlite stmt part ?%d failed with Error #%d\n" , i, errn );
+        sqlite3_finalize(ppStmt);
+    } else g_print("\nERROR: preparing sqlite stmt\n");
+
+    g_free(data);
+
+}/* End update_db Func */
+
+
 /******************************************************************************/
 /* Function:   load_open_datab                                                */
 /* Parameters: void* pArg, int argc, char** argv, char** columnNames */
@@ -107,7 +163,6 @@ void change_status( gpointer b, gpointer data )
 int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
 {
     extern GtkListStore* buglist;
-    //gchar* abug[] = { argv[0], argv[6], argv[1] };//TODO: ReFormat Query
     GtkTreeIter iter;
 
     #ifdef DEBUG
@@ -117,11 +172,13 @@ int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
     #endif
 
     gtk_list_store_append( buglist, &iter );
-    gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[6], NAME_COL, argv[1], -1 );
+    gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[1], NAME_COL, argv[2], -1 );
     return 0;
 }/* End load_open_datab Func */
 
 
+
+//TEMPLATE:
 // /******************************************************************************/
 // /******************************************************************************/
 // int load_list_datab( void* pArg, int argc, char** argv, char** columnNames )
@@ -133,8 +190,6 @@ int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
 //     gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[1], NAME_COL, argv[2], -1 );
 //     return 0;
 // }/* End load_list_datab Func */
-
-
 /******************************************************************************/
 /* Function:    */
 /* Parameters: void* pArg, int argc, char** argv, char** columnNames */

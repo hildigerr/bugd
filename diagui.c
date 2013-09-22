@@ -1,4 +1,4 @@
-/* $Id: diagui.c,v 1.18 2013/09/22 01:40:08 moonsdad Exp $ */
+/* $Id: diagui.c,v 1.20 2013/09/22 04:40:55 moonsdad Exp $ */
 #include "bugd.h"
 
 #define BORDER_WID_TEXTF 6
@@ -83,8 +83,10 @@ void add_bug( void )
 /******************************************************************************/
 /* Function:   modify_select_bug                                              */
 /* Parameters: gpointer b, gpointer data */
-/* WARNING: */
+/* WARNING: Postpones g_freeing Id                                            */
+/* TODO:    FIX: Canceling leaks memory at the moment                         */
 /******************************************************************************/
+void mop( gpointer a, gchar* leak ) { g_free(leak); }/* Helper Function */
 void modify_select_bug( gpointer b, gpointer data )
 {
     extern FIELD_LIST fl;
@@ -150,15 +152,26 @@ void modify_select_bug( gpointer b, gpointer data )
                     gtk_text_buffer_get_start_iter( buff, &text_iter );
                     gtk_text_buffer_insert( buff, &text_iter, (gchar*)(sqlite3_column_text( ppStmt, 3 )), -1 );
 
+                    content_area = gtk_dialog_get_action_area( GTK_DIALOG (dialog) );/* REUSING content_area */
+
+                    box = gtk_button_new_with_label( "Cancel" ); /* REUSING - Not a Box */
+                    gtk_signal_connect( GTK_OBJECT (box), "clicked", (GtkSignalFunc) close_window, GTK_OBJECT (dialog) );
+                    gtk_signal_connect( GTK_OBJECT (box), "clicked", (GtkSignalFunc) mop, Id );
+                    gtk_box_pack_end( GTK_BOX (content_area), box , FALSE, FALSE, BORDER_WID_TEXTF);
+
+                    box = gtk_button_new_with_label( "Update" ); /* REUSING - Not a Box */
+                    gtk_signal_connect( GTK_OBJECT (box), "clicked", (GtkSignalFunc) update_db, Id );
+                    gtk_signal_connect( GTK_OBJECT (box), "clicked", (GtkSignalFunc) close_window, GTK_OBJECT (dialog) );
+                    gtk_box_pack_end( GTK_BOX (content_area), box , FALSE, FALSE, BORDER_WID_TEXTF);
+
                     gtk_widget_show_all( dialog );
                 } else g_print( "\nERROR: Bug ID not found in database!\n" );
             }/* End ppStmt bind ok Else */
             sqlite3_finalize(ppStmt);/* Clean Up */
         } else g_print("\nERROR: preparing sqlite stmt\n");
-        g_free( bug_name ); g_free( Id );/* Clean Up */
+        g_free( bug_name ); //g_free( Id );/* Clean Up --Partially Postponed */
     } else g_print( "no row selected.\n" );
 }/* End modify_select_bug Func */
-
 
 /******************************************************************************/
 /* Function:   open_reproduce_window                                          */

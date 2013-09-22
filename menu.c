@@ -1,4 +1,4 @@
-/* $Id: menu.c,v 1.9 2013/09/22 01:40:08 moonsdad Exp $ */
+/* $Id: menu.c,v 1.10 2013/09/22 02:15:37 moonsdad Exp $ */
 #include "bugd.h"
 
 
@@ -36,7 +36,7 @@ void menu_file_open( void )
 /******************************************************************************/
 void file_open_ok( GtkWidget *w, GtkFileSelection *fs )
 {
-    char* statement = "SELECT * FROM bug_list";
+    char* statement = "SELECT Id, Status, Name FROM bug_list";
 
     extern sqlite3* bugdb;
     extern gboolean opendb;

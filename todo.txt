@@ -1,2 +1,5 @@
 -Add Menu->Edit->Preferences with options: hide buttons, hide menu, ...
 -Allow variable status values with user defined meanings
+-Display warning/error messages in a statusbar and/or pop-up notification
+-Make list headings clickable with functions to sort by Id or Name and to Hide solved bugs
+-Ability to DELETE bugs from the list altogether (maybe log them in a file just in case)

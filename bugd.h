@@ -1,4 +1,4 @@
-/* $Id: bugd.h,v 1.11 2013/09/22 01:40:08 moonsdad Exp $ */
+/* $Id: bugd.h,v 1.13 2013/09/22 04:46:42 moonsdad Exp $ */
 #pragma once
 
 #include <stdlib.h>
@@ -34,6 +34,7 @@ void menu_file_close( void );
 void close_window(GtkWidget *widget, gpointer window);
 void file_open_ok( GtkWidget *w, GtkFileSelection *fs );
 void submit_bug( void );
+void update_db( gpointer b, gchar* data );
 
 /* Bug List Store Functions */
 GtkWidget* init_list( void );
