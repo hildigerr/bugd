@@ -1,4 +1,4 @@
-/* $Id: datab.c,v 1.19 2013/09/22 04:40:55 moonsdad Exp $ */
+/* $Id: datab.c,v 1.20 2013/09/22 05:15:10 moonsdad Exp $ */
 #include "bugd.h"
 
 /******************************************************************************/
@@ -32,8 +32,8 @@ void submit_bug( void )
             #endif
         } else {
             g_print( "\nERROR: Failed to get buffer %d from field\n", i );
-        }
-    }
+        }/* End !get buffer Else */
+    }/* End DB_FIELD_QT For */
 
     if( sqlite3_prepare_v2( bugdb, "INSERT INTO bug_list( Name, Expectation, Behavior, Reproduce, Notes, Status ) VALUES(?,?,?,?,?,0)", -1, &ppStmt, NULL ) == SQLITE_OK ) {
         for( i = 0; i < DB_FIELD_QT; i++ ) {
@@ -42,8 +42,8 @@ void submit_bug( void )
                 g_print( "\nERROR: binding sqlite stmt part ?%d failed with Error #%d\n" , i+1, errn );
                 sqlite3_finalize(ppStmt);
                 return;
-            }
-        }
+            }/* End !OK If */
+        }/* End DB_FIELD_QT For */
         sqlite3_step(ppStmt);
         sqlite3_finalize(ppStmt);
     } else g_print("\nERROR: preparing sqlite stmt\n");
@@ -54,14 +54,13 @@ void submit_bug( void )
             g_print( "\nERROR: binding sqlite stmt part failed with Error #%d\n", errn );
             sqlite3_finalize(ppStmt);
             return;
-        }
+        }/* End !OK If */
         if( sqlite3_step(ppStmt) == SQLITE_ROW ) {
             gtk_list_store_append( buglist, &iter );
             gtk_list_store_set( buglist, &iter, ID_COL, sqlite3_column_text( ppStmt, 0 ), STATUS_COL, sqlite3_column_text( ppStmt, 1 ), NAME_COL, sqlite3_column_text( ppStmt, 2 ), -1 );
         } else g_print("\nERROR: Reload your database. (close and then open)\n");
         sqlite3_finalize(ppStmt);
     } else g_print("\nERROR: preparing sqlite stmt\n");
-
 }/* End submit_bug Func */
 
 
@@ -101,8 +100,9 @@ void change_status( gpointer b, gpointer data )
 
 /******************************************************************************/
 /* Function:    update_db                                                     */
-/* Parameters: gpointer b, gchar* data */
-/* WARNING:     Must cleanup data to prevent memory leak. */
+/* Parameters:  gpointer    b       -- Attached Button                        */
+/*              gchar*      data    -- Id of db entry to update               */
+/* WARNING:     g_frees data to prevent memory leak.                          */
 /******************************************************************************/
 void update_db( gpointer b, gchar* data )
 {
@@ -129,8 +129,8 @@ void update_db( gpointer b, gchar* data )
             #endif
         } else {
             g_print( "\nERROR: Failed to get buffer %d from field\n", i );
-        }
-    }
+        }/* End !get buffer Else */
+    }/* End DB_FIELD_QT For */
 
     if( sqlite3_prepare_v2( bugdb, "UPDATE bug_list SET Expectation = ?, Behavior = ?, Reproduce = ?, Notes = ? WHERE Id = ?", -1, &ppStmt, NULL ) == SQLITE_OK ) {
         for( i = 1; i < DB_FIELD_QT; i++ ) {
@@ -141,7 +141,7 @@ void update_db( gpointer b, gchar* data )
                 g_free(data);
                 return;
             }/* End !OK If */
-        }/* End i For */
+        }/* End DB_FIELD_QT For */
         errn = sqlite3_bind_text( ppStmt, i, data, -1, NULL ); /* (i == DB_FIELD_QT) from for-loop , data is Id */
         if( errn == SQLITE_OK ) {
             if( sqlite3_step(ppStmt) != SQLITE_DONE ) g_print("\nERROR: step failed: %s\n", sqlite3_errmsg(bugdb) );
@@ -155,10 +155,12 @@ void update_db( gpointer b, gchar* data )
 
 
 /******************************************************************************/
-/* Function:   load_open_datab                                                */
-/* Parameters: void* pArg, int argc, char** argv, char** columnNames */
-/* Returns:     int    -   SQLite API expects this to be 0, Aborts otherwise. */
-/* WARNING: */
+/* Function:    load_open_datab                                               */
+/* Parameters:  void* pArg                                                    */
+/*              int argc        -- Qt of elements in argv                     */
+/*              char** argv     -- Result Columns of sqlite3_exec             */
+/*              char** columnNames                                            */
+/* Returns:     int    --  SQLite API expects this to be 0, Aborts otherwise. */
 /******************************************************************************/
 int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
 {
@@ -179,9 +181,13 @@ int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
 
 
 //TEMPLATE:
-// /******************************************************************************/
-// /******************************************************************************/
-// int load_list_datab( void* pArg, int argc, char** argv, char** columnNames )
+/******************************************************************************/
+/* Function:    */
+/* Parameters:  void* pArg, int argc, char** argv, char** columnNames */
+/* Returns:     int    --  SQLite API expects this to be 0, Aborts otherwise. */
+/* WARNING: */
+/******************************************************************************/
+// int Callback( void* pArg, int argc, char** argv, char** columnNames )
 // {
 //     extern GtkListStore* buglist;
 //     GtkTreeIter iter;
@@ -189,14 +195,4 @@ int load_open_datab( void* pArg, int argc, char** argv, char** columnNames )
 //     gtk_list_store_append( buglist, &iter );
 //     gtk_list_store_set( buglist, &iter, ID_COL, argv[0], STATUS_COL, argv[1], NAME_COL, argv[2], -1 );
 //     return 0;
-// }/* End load_list_datab Func */
-/******************************************************************************/
-/* Function:    */
-/* Parameters: void* pArg, int argc, char** argv, char** columnNames */
-/* Returns:     int    -   SQLite API expects this to be 0, Aborts otherwise. */
-/* WARNING: */
-/******************************************************************************/
-// int Callback( void* pArg, int argc, char** argv, char** columnNames )
-// {
-//   return 0;
 // }/* End Func */

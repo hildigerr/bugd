@@ -1,12 +1,12 @@
-/* $Id: diagui.c,v 1.20 2013/09/22 04:40:55 moonsdad Exp $ */
+/* $Id: diagui.c,v 1.21 2013/09/22 05:15:10 moonsdad Exp $ */
 #include "bugd.h"
 
 #define BORDER_WID_TEXTF 6
 #define DEFAULT_POPUP_SIZE 360,620
 
 /******************************************************************************/
-/* Function:   add_bug                                                        */
-/* Parameters: gpointer data                                                  */
+/* Function:    add_bug                                                       */
+/* Parameters:  gpointer data                                                 */
 /* WARNING: Only one instance of this open at a time. TODO: Enforce           */
 /******************************************************************************/
 void add_bug( void )
@@ -81,10 +81,12 @@ void add_bug( void )
 
 
 /******************************************************************************/
-/* Function:   modify_select_bug                                              */
-/* Parameters: gpointer b, gpointer data */
+/* Function:    modify_select_bug                                             */
+/* Parameters:  gpointer b       -- Attached Button                           */
+/*              gpointer data    -- The buglist view (with row selected)      */
 /* WARNING: Postpones g_freeing Id                                            */
-/* TODO:    FIX: Canceling leaks memory at the moment                         */
+/* HELPER FUNCTION: mop -- Free's Id of selected bug which had to be retained */
+/*                          to be passed to update_db() via Update button.    */
 /******************************************************************************/
 void mop( gpointer a, gchar* leak ) { g_free(leak); }/* Helper Function */
 void modify_select_bug( gpointer b, gpointer data )
@@ -173,10 +175,11 @@ void modify_select_bug( gpointer b, gpointer data )
     } else g_print( "no row selected.\n" );
 }/* End modify_select_bug Func */
 
+
 /******************************************************************************/
-/* Function:   open_reproduce_window                                          */
-/* Parameters: gpointer data*/
-/* WARNING: */
+/* Function:    open_reproduce_window                                         */
+/* Parameters:  gpointer    b       -- Attached Button                        */
+/*              gpointer    data    -- The buglist view (with row selected)   */
 /******************************************************************************/
 void open_reproduce_window( gpointer b, gpointer data )
 {
@@ -232,9 +235,9 @@ void open_reproduce_window( gpointer b, gpointer data )
 
 
 /******************************************************************************/
-/* Function:   open_behave_window                                             */
-/* Parameters: gpointer data*/
-/* WARNING: */
+/* Function:    open_behave_window                                            */
+/* Parameters:  gpointer    b       -- Attached Button                        */
+/*              gpointer    data    -- The buglist view (with row selected)   */
 /******************************************************************************/
 void open_behave_window( gpointer b, gpointer data )
 {

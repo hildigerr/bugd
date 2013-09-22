@@ -1,4 +1,4 @@
-/* $Id: menu.c,v 1.10 2013/09/22 02:15:37 moonsdad Exp $ */
+/* $Id: menu.c,v 1.11 2013/09/22 05:15:11 moonsdad Exp $ */
 #include "bugd.h"
 
 
@@ -30,7 +30,7 @@ void menu_file_open( void )
 
 /******************************************************************************/
 /* Function:    file_open_ok                                                  */
-/* Parameters:  GtkWidget ptr   w                                             */
+/* Parameters:  GtkWidget ptr           w                                     */
 /*              GtkFileSelection ptr    fs                                    */
 /* Called by the file selection dialogue box when the ok button is clicked.   */
 /******************************************************************************/
