@@ -1,5 +1,6 @@
 I started writing this graphical bug tracker in order to learn GTK and the C API for SQLite.
 I'm calling it bugd for "bug database." I plan to use it with my school assignments.
+It is available to be installed via my ppa <https://launchpad.net/~moonsdad/+archive/ppa>
 
 So far, you can open/create a database, load it with bug reports, change their status
 between 0 and 1, and view/edit the bug's data. See "todo.txt" for unimplemented feature plans.

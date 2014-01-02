@@ -1,3 +1,4 @@
+-have user config file for preferences
 -Add Menu->Edit->Preferences with options: hide buttons, hide menu, ...
 -Allow variable status values with user defined meanings
 -Display warning/error messages in a statusbar and/or pop-up notification
