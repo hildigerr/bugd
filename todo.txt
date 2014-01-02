@@ -6,3 +6,4 @@
 -Ability to DELETE bugs from the list altogether (maybe log them in a file just in case)
 -Test vs. Injections
 -add right-click on bug popup menu
+-tab to move cursor to next box

@@ -8,7 +8,7 @@ SRCS = menu.c diagui.c datab.c bugd.c
 INSTALL_DIR = ${DESTDIR}/usr/bin/
 MAN_INSTALL_DIR = ${DESTDIR}/usr/share/man/man1/
 ICON_INSTALL_DIR = ${DESTDIR}/usr/share/icons/
-MENU_INSTALL_DIR = ${DESTDIR}/usr/local/share/applications/
+MENU_INSTALL_DIR = ${DESTDIR}/usr/share/applications/
 
 bugd : ${SRCS}
 	${CC} ${SRCS} -o ${@} ${LFLAGS} ${CONFIG}
