@@ -1,1 +1,5 @@
 CVS/*
+.bzr/*
+.bzrignore
+
+debian/*
