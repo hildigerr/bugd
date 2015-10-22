@@ -20,7 +20,7 @@ man:
 	gzip -c bugd.1 > bugd.1.gz
 
 install: bugd man
-	@ mv bugd ${INSTALL_DIR} ; mv bugd.1.gz ${MAN_INSTALL_DIR} ; cp bugd.png ${ICON_INSTALL_DIR} ; cp BugD.desktop ${MENU_INSTALL_DIR}
+	@ mv bugd ${INSTALL_DIR} ; mv bugd.1.gz ${MAN_INSTALL_DIR} ; cp icons/bugd-icon.png ${ICON_INSTALL_DIR}bugd.png ; cp BugD.desktop ${MENU_INSTALL_DIR}
 
 
 ${SRCS} : bugd.h

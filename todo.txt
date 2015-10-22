@@ -7,3 +7,6 @@
 -Test vs. Injections
 -add right-click on bug popup menu
 -tab to move cursor to next box
+-merge duplicate bug option
+-Import/Export feature
+-Integrate with other systems, eg: Roundup (via plugins?)

@@ -21,5 +21,6 @@ Bug Reports in the database consist of:
     <li> Status INTEGER      -- 0 == opened ; 1 == solved</li>
 </ul>
 
-The current Icon is from:
+I originally used the icon from from:
 http://findicons.com/icon/203378/bug_buddy?id=204799
+But, now I'm using an icon that I made. A bit of trivia about it is that it contains a secret message. I'm sure someone will find it easily if they try. Please, let me know if you do.
