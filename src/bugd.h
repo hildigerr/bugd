@@ -7,13 +7,10 @@
 
 //#define DEBUG
 
+#define BUG_LIST_COLS 3
 #define DB_FIELD_QT 5
-
-/* PREFERENCES */
-#define DEFAULT_WINDOW_SIZE 273,373
 #define BORDER_WID_INNER 8
 #define BORDER_WID_TWIXT 4
-#define BUG_LIST_COLS 3
 
 typedef struct { GtkWidget* field[DB_FIELD_QT]; } FIELD_LIST;
 
