@@ -21,10 +21,15 @@ man:
 	gzip -c doc/bugd.1 > bugd.1.gz
 
 install: bugd man
+	@ mkdir -p ${INSTALL_DIR}
 	@ mv bugd ${INSTALL_DIR}
+	@ mkdir -p ${MAN_INSTALL_DIR}
 	@ mv bugd.1.gz ${MAN_INSTALL_DIR}
+	@ mkdir -p ${ICON_INSTALL_DIR}
 	@ cp icons/bugd-icon.png ${ICON_INSTALL_DIR}bugd.png
+	@ mkdir -p ${MENU_INSTALL_DIR}
 	@ cp BugD.desktop ${MENU_INSTALL_DIR}
+	@ mkdir -p ${CONF_INSTALL_DIR}
 	@ cp doc/bugd.cfg ${CONF_INSTALL_DIR}
 
 clean:
