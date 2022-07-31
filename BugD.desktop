@@ -2,7 +2,7 @@
 Name=BugD
 Exec=bugd
 Comment=Bug Tracking
-Icon=/usr/share/icons/bugd.png
+Icon=/usr/share/icons/hicolor/128x128/apps/bugd.png
 NoDisplay=false
 Categories=Development;
 Type=Application

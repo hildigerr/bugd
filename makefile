@@ -7,7 +7,7 @@ CONFIG = `pkg-config --cflags --libs gtk+-2.0 libconfuse`
 SRCS = src/menu.c src/diagui.c src/datab.c src/bugd.c src/config.c
 INSTALL_DIR = ${DESTDIR}/usr/bin/
 MAN_INSTALL_DIR = ${DESTDIR}/usr/share/man/man1/
-ICON_INSTALL_DIR = ${DESTDIR}/usr/share/icons/
+ICON_INSTALL_DIR = ${DESTDIR}/usr/share/icons/hicolor/128x128/apps/
 MENU_INSTALL_DIR = ${DESTDIR}/usr/share/applications/
 CONF_INSTALL_DIR = ${DESTDIR}/etc/
 
@@ -26,7 +26,7 @@ install: bugd man
 	@ mkdir -p ${MAN_INSTALL_DIR}
 	@ mv bugd.1.gz ${MAN_INSTALL_DIR}
 	@ mkdir -p ${ICON_INSTALL_DIR}
-	@ cp icons/bugd-icon.png ${ICON_INSTALL_DIR}bugd.png
+	@ cp icons/bugd-icon.png ${ICON_INSTALL_DIR}/bugd.png
 	@ mkdir -p ${MENU_INSTALL_DIR}
 	@ cp BugD.desktop ${MENU_INSTALL_DIR}
 	@ mkdir -p ${CONF_INSTALL_DIR}
